@@ -1,0 +1,93 @@
+<template>
+    <repeat for="{{poems}}" item="poem" key="poem.idnew" index="index">
+        <poemcell :poem="poem"></poemcell>
+    </repeat>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+import PoemCellCom from '../components/poem_cell'
+
+export default class Recommend extends wepy.page{
+
+    config = {
+      enablePullDownRefresh: true
+    }
+
+    props = {
+        poem : Object
+    }
+
+    components = {
+        'poemcell': PoemCellCom
+    }
+
+    data = {
+        sumPage: 1,
+        currentPage: 1,
+        poems: []
+    }
+
+    onLoad() {
+        this.loadMoreRecommendPoems()
+    }
+
+    onPullDownRefresh() {
+        this.currentPage = 1;
+        let that = this
+        this.loadMoreRecommendPoems((res) => {
+            wepy.stopPullDownRefresh()
+        })
+    }
+
+    onReachBottom() {
+        if(this.currentPage > 2){
+            wepy.showToast({
+                title: "没有更多数据",
+                mask: true,
+                icon: 'none',
+                duration: 1500
+            })
+            return
+        }
+        this.loadMoreRecommendPoems()
+    }
+
+    loadMoreRecommendPoems(callback) {
+        let that = this
+        wepy.showNavigationBarLoading()
+        wepy.request({
+            header: {
+                'content-type': 'application/x-www-form-urlencoded',
+            },
+            method: 'post',
+            data: {
+                page: that.currentPage,
+                token: 'gswapi'
+            },
+            url: 'https://appbei.gushiwen.cn/api/onehour/Default.aspx',
+            complete: (res) => {
+                console.log(res)
+                wepy.hideNavigationBarLoading()
+                if(callback) {
+                    callback(res.data.gushiwens)
+                    return
+                }
+
+                if(res.data.gushiwens == undefined) {
+                    that.$apply()
+                    return
+                }
+
+                that.poems = that.poems.concat(res.data.gushiwens)
+                that.currentPage = that.currentPage + 1
+                that.sumPage = res.data.sumPage
+                console.log(that.sumPage)
+                that.$apply()
+            }
+        }) 
+    }
+    
+}
+</script>

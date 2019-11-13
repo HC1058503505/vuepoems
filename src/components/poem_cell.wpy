@@ -1,0 +1,51 @@
+
+<style lang="css">
+.poem_title {
+    font: large;
+    text-align: center;
+}
+
+.poem_author_info {
+    text-align: center;
+    font: smaller;
+    color: #8a8a8a;
+}
+
+.poem_cont {
+    text-align: left;
+    display: inline-block;
+    line-height: 25px;
+}
+
+.poem_cell_content_view {
+    background-color: #F6F6F6;
+    padding-top: 10px;
+    align-content: center;
+    text-align: center;
+}
+
+.poem_content_container {
+    background-color: white;
+    padding: 10px;
+}
+
+</style>
+
+
+<template lang="wxml">
+    <view class="poem_cell_content_view">
+        <view class="poem_content_container">
+            <view class="poem_title">{{poem.nameStr}}</view>
+            <view class="poem_author_info">{{poem.chaodai + ' / ' + poem.author}}</view>
+            <rich-text class="poem_cont" nodes="{{poem.cont}}"></rich-text>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class PoemCell extends wepy.component{
+  
+  
+}
+</script>
