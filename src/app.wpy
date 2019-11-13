@@ -24,7 +24,8 @@ export default class extends wepy.app {
     pages: [
       'pages/recommend',
       'pages/findmore',
-      'pages/me'
+      'pages/me',
+      'pages/poemdetail'
     ],
     tabBar: {
       color: '#8A8A8A',
@@ -53,7 +54,7 @@ export default class extends wepy.app {
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'VuePoems',
+      navigationBarTitleText: '小诗词',
       navigationBarTextStyle: 'black'
     }
   }

@@ -29,12 +29,19 @@ export default class Recommend extends wepy.page{
         poems: []
     }
 
+    events = {
+        tapPoemCell: (index) => {
+            this.$preload("poem", this.poems[index])
+            wepy.navigateTo({ url: '/pages/poemdetail'})
+        }
+    }
+
     onLoad() {
         this.loadMoreRecommendPoems()
     }
 
     onPullDownRefresh() {
-        this.currentPage = 1;
+        this.currentPage = 1
         let that = this
         this.loadMoreRecommendPoems((res) => {
             wepy.stopPullDownRefresh()
@@ -42,7 +49,7 @@ export default class Recommend extends wepy.page{
     }
 
     onReachBottom() {
-        if(this.currentPage > 2){
+        if(this.currentPage > this.sumPage){
             wepy.showToast({
                 title: "没有更多数据",
                 mask: true,

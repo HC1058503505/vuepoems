@@ -1,0 +1,19 @@
+<template lang="wxml">
+    <bottomTabBar></bottomTabBar>
+</template>
+
+<script>
+import wepy from 'wepy'
+import BottomTabBarCom from '../components/bottomtabbar'
+
+export default class PoemDetail extends wepy.page {
+    components = {
+        bottomTabBar: BottomTabBarCom
+    }
+    onLoad(params, data) {
+        wepy.setNavigationBarTitle({ title: data.preload.poem.nameStr });
+        
+    }
+}
+</script>
+

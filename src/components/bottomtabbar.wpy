@@ -1,0 +1,38 @@
+
+<style lang="less">
+
+.zhengwen, .yizhu, .shangxi, .author {
+    display:inline;
+}
+</style>
+
+
+<template lang="wxml">
+    <view class="bottom_tab_bar_container">
+        <view class="zhengwen" @tap="selectedZhengWenBarItem">正文</view>
+        <view class="yizhu" @tap="selectedYiZhuBarItem">译注</view>
+        <view class="shangxi" @tap="selectedShangXiBarItem">赏析</view>
+        <view class="author"  @tap="selectedAuthorBarItem">作者</view>
+    </view>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+export default class BottomTabBar extends wepy.component{
+    methods = {
+        selectedZhengWenBarItem: () => {
+            this.$emit('selectedZhengWenBarItem')
+        },
+        selectedYiZhuBarItem: () => {
+            this.$emit('selectedYiZhuBarItem')
+        },
+        selectedShangXiBarItem: () => {
+            this.$emit('selectedShangXiBarItem')
+        },
+        selectedAuthorBarItem: () => {
+            this.$emit('selectedAuthorBarItem')
+        }
+    }
+}
+</script>

@@ -33,7 +33,7 @@
 
 
 <template lang="wxml">
-    <view class="poem_cell_content_view">
+    <view class="poem_cell_content_view" @tap="tapPoemCell">
         <view class="poem_content_container">
             <view class="poem_title">{{poem.nameStr}}</view>
             <view class="poem_author_info">{{poem.chaodai + ' / ' + poem.author}}</view>
@@ -45,7 +45,11 @@
 <script>
 import wepy from 'wepy'
 export default class PoemCell extends wepy.component{
-  
+  methods = {
+      tapPoemCell: function(value){
+          this.$emit('tapPoemCell', value.currentTarget.dataset.comIndex)
+      }
+  }
   
 }
 </script>
