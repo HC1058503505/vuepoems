@@ -1,0 +1,13 @@
+<template>
+    <View class="poem_cont_container">
+        <view>{{poemData.cont}}</view>
+    </View>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+export default class PoemCont extends wepy.component {
+    
+}
+</script>

@@ -1,0 +1,15 @@
+<template>
+    <view class="poem_tag_container">
+        <repeat for="{{poemData.tags.split('|')}}" item="tag" key="tag" index="index">
+            <view>{{tag}}</view>
+        </repeat>
+    </view>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+export default class PoemTags extends wepy.component {
+    
+}
+</script>

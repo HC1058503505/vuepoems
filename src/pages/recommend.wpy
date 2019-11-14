@@ -1,6 +1,6 @@
 <template>
     <repeat for="{{poems}}" item="poem" key="poem.idnew" index="index">
-        <poemcell :poem="poem"></poemcell>
+        <poemcell :poemData="poem"></poemcell>
     </repeat>
 </template>
 
@@ -16,11 +16,11 @@ export default class Recommend extends wepy.page{
     }
 
     props = {
-        poem : Object
+        poemData: Object
     }
 
     components = {
-        'poemcell': PoemCellCom
+        poemcell: PoemCellCom
     }
 
     data = {

@@ -1,8 +1,12 @@
 
 <style lang="less">
-
+.bottom_tab_bar_container {
+    display: flex;
+}
 .zhengwen, .yizhu, .shangxi, .author {
-    display:inline;
+    // display:inline;
+    border-bottom-color: red;
+    border-bottom-width: 100px;
 }
 </style>
 

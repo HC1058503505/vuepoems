@@ -1,18 +1,36 @@
 <template lang="wxml">
+    <poemCont poemData="poem"></poemCont>
+    <poemTags poemData="poem"></poemTags>
     <bottomTabBar></bottomTabBar>
 </template>
 
 <script>
 import wepy from 'wepy'
+import PoemContCom from '../components/poemcont'
+import PoemTagsCom from '../components/poemtags'
 import BottomTabBarCom from '../components/bottomtabbar'
 
 export default class PoemDetail extends wepy.page {
     components = {
-        bottomTabBar: BottomTabBarCom
+        bottomTabBar: BottomTabBarCom,
+        poemCont: PoemContCom,
+        poemTags: PoemTagsCom
     }
+
+    props = {
+        poemData: Object
+    }
+
+    data = {
+        poem: null
+    }
+
     onLoad(params, data) {
-        wepy.setNavigationBarTitle({ title: data.preload.poem.nameStr });
-        
+        if(data.preload.poem) {
+            this.poem = data.preload.poem
+            console.log(this.poem)
+            wepy.setNavigationBarTitle({ title: data.preload.poem.nameStr });
+        }
     }
 }
 </script>
