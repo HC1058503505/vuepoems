@@ -1,0 +1,17 @@
+<template>
+    <view>
+        Author
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class PoemAuthor extends wepy.component{
+    
+}
+</script>
+
+
+<style lang="less" scoped>
+
+</style>

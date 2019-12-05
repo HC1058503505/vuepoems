@@ -1,22 +1,34 @@
 
-<style lang="less">
+<style lang="less" scope>
 .bottom_tab_bar_container {
+    background-color: white;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
     display: flex;
-}
-.zhengwen, .yizhu, .shangxi, .author {
-    // display:inline;
-    border-bottom-color: red;
-    border-bottom-width: 100px;
+    display: -webkit-flex;
+    justify-content: space-around;
+    align-content: flex-end;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    font-size: 14px;
+    .zhengwen, .yizhu, .shangxi, .author {
+        border-bottom-style: solid;
+        border-bottom-color: palevioletred;
+        border-bottom-width: 3px;
+        color: palevioletred;
+        font-size: 16px;
+    }
 }
 </style>
 
 
 <template lang="wxml">
     <view class="bottom_tab_bar_container">
-        <view class="zhengwen" @tap="selectedZhengWenBarItem">正文</view>
-        <view class="yizhu" @tap="selectedYiZhuBarItem">译注</view>
-        <view class="shangxi" @tap="selectedShangXiBarItem">赏析</view>
-        <view class="author"  @tap="selectedAuthorBarItem">作者</view>
+        <view :class="{ 'zhengwen': selectedIndex == 0 }" @tap="selectedBarItem(0)">正文</view>
+        <view :class="{ 'yizhu': selectedIndex == 1 }" @tap="selectedBarItem(1)">译注</view>
+        <view :class="{ 'shangxi': selectedIndex == 2 }" @tap="selectedBarItem(2)">赏析</view>
+        <view :class="{ 'author': selectedIndex == 3 }"  @tap="selectedBarItem(3)">作者</view>
     </view>
 </template>
 
@@ -24,18 +36,15 @@
 <script>
 import wepy from 'wepy'
 export default class BottomTabBar extends wepy.component{
+    data = {
+        selectedIndex: 0
+    }
+
     methods = {
-        selectedZhengWenBarItem: () => {
-            this.$emit('selectedZhengWenBarItem')
-        },
-        selectedYiZhuBarItem: () => {
-            this.$emit('selectedYiZhuBarItem')
-        },
-        selectedShangXiBarItem: () => {
-            this.$emit('selectedShangXiBarItem')
-        },
-        selectedAuthorBarItem: () => {
-            this.$emit('selectedAuthorBarItem')
+        selectedBarItem: (index) => {
+            this.selectedIndex = index
+            this.$emit('selectedBarItem', index)
+            console.log('emit: $index')
         }
     }
 }

@@ -1,36 +1,92 @@
 <template lang="wxml">
-    <poemCont poemData="poem"></poemCont>
-    <poemTags poemData="poem"></poemTags>
-    <bottomTabBar></bottomTabBar>
+    <block wx:if="{{selectedIndex == 0}}">
+        <poemCont :poemData.sync="poem"></poemCont>
+        <poemTags :poemTags.sync="poemtags"></poemTags>
+    </block>
+    <block wx:elif="{{selectedIndex == 1}}">
+        <poemFanyi :poemFanyi.sync="poem"></poemFanyi>
+    </block>
+    <block wx:elif="{{selectedIndex == 2}}">
+        <poemShangxi :poemShangxi.sync="poem"></poemShangxi>
+    </block>
+    <block wx:else>
+        <poemAuthor></poemAuthor>
+    </block>
+    
+    
+    <bottomTabBar :poemData.sync="poem"></bottomTabBar>
 </template>
 
 <script>
 import wepy from 'wepy'
+import request from '../request/request.js'
 import PoemContCom from '../components/poemcont'
 import PoemTagsCom from '../components/poemtags'
 import BottomTabBarCom from '../components/bottomtabbar'
+import PoemFanyiCom from '../components/poem_fanyi'
+import PoemShangxiCom from '../components/poem_shangxi'
+import PoemAuthorCom from '../components/poem_author'
 
 export default class PoemDetail extends wepy.page {
     components = {
         bottomTabBar: BottomTabBarCom,
         poemCont: PoemContCom,
-        poemTags: PoemTagsCom
-    }
-
-    props = {
-        poemData: Object
+        poemTags: PoemTagsCom,
+        poemFanyi: PoemFanyiCom,
+        poemShangxi: PoemShangxiCom,
+        poemAuthor: PoemAuthorCom
     }
 
     data = {
-        poem: null
+        poem: Object,
+        poemtags: [String],
+        selectedIndex: 0
+    }
+
+    events = {
+        'selectedBarItem': (index) => {
+            this.selectedIndex = index
+        }
     }
 
     onLoad(params, data) {
-        if(data.preload.poem) {
-            this.poem = data.preload.poem
-            console.log(this.poem)
-            wepy.setNavigationBarTitle({ title: data.preload.poem.nameStr });
+        if(!data.preload.poem) {
+            return
         }
+
+        wepy.setNavigationBarTitle({ title: data.preload.poem.nameStr })
+        this.poem.tb_gushiwen = data.preload.poem
+
+        let that = this
+        request({
+            url: '/api/shiwen/shiwenv3.aspx',
+            method: 'post',
+            data: {token: 'gswapi', id: data.preload.poem.idnew},
+            header: {
+                'content-type': 'application/x-www-form-urlencoded',
+            },
+            success: (res) => {
+                that.poem = res.data
+                
+
+                for (const index in that.poem.tb_fanyis.fanyis) {
+                    let fanyi = that.poem.tb_fanyis.fanyis[index]
+                    if (fanyi.hasOwnProperty('cont')) {
+                        that.poem.tb_fanyis.fanyis[index].cont = fanyi.cont.replace(/<strong>/ig, '<strong class="fanyi_strong" style="padding-top: 15px; padding-bottom: 10px;">')
+                    }
+                }
+
+                console.log(that.poem.tb_fanyis.fanyis)
+                
+                that.poemtags = res.data.tb_gushiwen.tag.split('|')
+                that.$apply()
+            },
+            fail: (error) => {
+                console.log(error)
+            },
+            complete: () => {
+            }
+        })
     }
 }
 </script>

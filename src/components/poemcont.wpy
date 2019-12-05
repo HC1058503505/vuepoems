@@ -1,13 +1,61 @@
 <template>
-    <View class="poem_cont_container">
-        <view>{{poemData.cont}}</view>
-    </View>
+    <view class="poem_cont_container">
+        <view class="poem_cont_tools">
+            <image src="../images/no_collection.png" alt=""/> 
+            <image src="../images/share.png" alt=""/>
+            <image src="../images/more.png" alt=""/>
+        </view>
+        <view class="poem_chaodai_author">{{poemData.tb_gushiwen.chaodai + '/' + poemData.tb_gushiwen.author}}</view>
+        <view class="rich_cont_container">
+            <rich-text class="poem_cont" nodes="{{poemData.tb_gushiwen.cont}}"></rich-text>
+        </view>
+    </view>
 </template>
 
 
 <script>
 import wepy from 'wepy'
 export default class PoemCont extends wepy.component {
-    
+     props = {
+         poemData: Object
+     }
+
+     onLoad () {
+
+     }
 }
 </script>
+
+<style lang="less" scoped>
+.poem_cont_container {
+    background-color: ghostwhite;
+    padding: 15px;
+    
+    .poem_chaodai_author {
+        padding-bottom: 10px;
+        text-align: center;
+        font-size: 15px;
+        color: gray;
+    }
+    .poem_cont_tools {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: flex-end;
+        padding-bottom: 10px;
+        image {
+            width: 20px;
+            height: 20px;
+            padding-right: 20px;
+        }
+    }
+
+    .rich_cont_container {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: center;
+    }
+    .poem_cont {
+        line-height: 25px;
+    }
+}
+</style>

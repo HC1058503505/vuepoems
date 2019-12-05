@@ -1,0 +1,25 @@
+<template>
+    <view>
+        <repeat for="{{poemShangxi.tb_shangxis.shangxis}}" item="shangxi" key="shangxi.id">
+            <view>{{shangxi.nameStr}}</view>
+            <rich-text nodes="{{shangxi.cont}}"></rich-text>
+            <block wx:if="{{shangxi.cankao !== '0'}}">
+                <view>{{shangxi.cankao}}</view>
+            </block>
+        </repeat>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class PoemShangxi extends wepy.component{
+    props = {
+        poemShangxi: Object
+    }
+}
+</script>
+
+
+<style lang="less" scoped>
+
+</style>

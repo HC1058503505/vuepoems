@@ -1,7 +1,7 @@
 <template>
     <view class="poem_tag_container">
-        <repeat for="{{poemData.tags.split('|')}}" item="tag" key="tag" index="index">
-            <view>{{tag}}</view>
+        <repeat for="{{poemTags}}" item="tag" key="tag">
+            <view class="tag_item">{{tag}}</view>
         </repeat>
     </view>
 </template>
@@ -10,6 +10,29 @@
 <script>
 import wepy from 'wepy'
 export default class PoemTags extends wepy.component {
+    props = {
+        poemTags: [String]
+    }
     
+    onLoad () {
+        
+    }
 }
 </script>
+
+
+<style lang="less" scoped>
+.poem_tag_container {
+    display: flex;
+    display: -webkit-flex;
+    align-content: center;
+    flex-wrap: wrap;
+    .tag_item {
+        font-size: 12px;
+        margin: 10px 0px 0px 15px;;
+        padding: 5px 10px;
+        border: solid 1px gainsboro;
+        border-radius: 10px;
+    }
+}
+</style>

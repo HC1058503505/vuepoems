@@ -1,0 +1,45 @@
+<template>
+    <view class="fanyi_container">
+        <repeat for="{{poemFanyi.tb_fanyis.fanyis}}" item="fanyi" key="fanyi.id">
+            <view class="fanyi_title">{{fanyi.nameStr}}</view>
+            <rich-text nodes="{{fanyi.cont}}"></rich-text>
+            <block wx:if="{{fanyi.cankao !== '0'}}">
+                <view class="fanyi_cankao">[参考]{{fanyi.cankao}}</view>
+            </block>
+        </repeat>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class PoemFanyi extends wepy.component{
+    props = {
+        poemFanyi: Object
+    }
+}
+</script>
+
+
+<style lang="less" scoped>
+.fanyi_container {
+    padding: 0px 15px 80px 15px;
+    .fanyi_title {
+        padding-bottom: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        color: palevioletred;
+        border-bottom-color: gainsboro;
+        border-bottom-style: dotted;
+    }
+
+    .fanyi_strong {
+        padding-top: 150px;
+        padding-bottom: 10px;
+    }
+    
+    .fanyi_cankao {
+        font-weight: bold;
+        color: blue;
+    }
+}
+</style>
