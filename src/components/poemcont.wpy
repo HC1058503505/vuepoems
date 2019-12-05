@@ -1,15 +1,17 @@
 <template>
-    <view class="poem_cont_container">
-        <view class="poem_cont_tools">
-            <image src="../images/no_collection.png" alt=""/> 
-            <image src="../images/share.png" alt=""/>
-            <image src="../images/more.png" alt=""/>
+    <block wx:if="{{ poemData.tb_gushiwen }}">
+        <view class="poem_cont_container">
+                <view class="poem_cont_tools">
+                    <image src="../images/no_collection.png" alt=""/> 
+                    <image src="../images/share.png" alt=""/>
+                    <image src="../images/more.png" alt=""/>
+                </view>
+                <view class="poem_chaodai_author">{{poemData.tb_gushiwen.chaodai + '/' + poemData.tb_gushiwen.author}}</view>
+                <view class="rich_cont_container">
+                    <rich-text class="poem_cont" nodes="{{poemData.tb_gushiwen.cont}}"></rich-text>
+                </view>
         </view>
-        <view class="poem_chaodai_author">{{poemData.tb_gushiwen.chaodai + '/' + poemData.tb_gushiwen.author}}</view>
-        <view class="rich_cont_container">
-            <rich-text class="poem_cont" nodes="{{poemData.tb_gushiwen.cont}}"></rich-text>
-        </view>
-    </view>
+    </block>
 </template>
 
 
@@ -30,7 +32,8 @@ export default class PoemCont extends wepy.component {
 .poem_cont_container {
     background-color: ghostwhite;
     padding: 15px;
-    
+    margin-left: 15px;
+    margin-right: 15px;
     .poem_chaodai_author {
         padding-bottom: 10px;
         text-align: center;

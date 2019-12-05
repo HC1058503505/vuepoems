@@ -10,7 +10,7 @@
         <poemShangxi :poemShangxi.sync="poem"></poemShangxi>
     </block>
     <block wx:else>
-        <poemAuthor></poemAuthor>
+        <poemAuthor :poemAuthor.sync="poem"></poemAuthor>
     </block>
     
     
@@ -56,7 +56,8 @@ export default class PoemDetail extends wepy.page {
 
         wepy.setNavigationBarTitle({ title: data.preload.poem.nameStr })
         this.poem.tb_gushiwen = data.preload.poem
-
+        wepy.showNavigationBarLoading();
+        
         let that = this
         request({
             url: '/api/shiwen/shiwenv3.aspx',
@@ -66,18 +67,9 @@ export default class PoemDetail extends wepy.page {
                 'content-type': 'application/x-www-form-urlencoded',
             },
             success: (res) => {
+                // res.data.tb_author.pic =  'https://song.gushiwen.org/authorImg/' + res.data.tb_author.pic + '.jpg'
                 that.poem = res.data
-                
-
-                for (const index in that.poem.tb_fanyis.fanyis) {
-                    let fanyi = that.poem.tb_fanyis.fanyis[index]
-                    if (fanyi.hasOwnProperty('cont')) {
-                        that.poem.tb_fanyis.fanyis[index].cont = fanyi.cont.replace(/<strong>/ig, '<strong class="fanyi_strong" style="padding-top: 15px; padding-bottom: 10px;">')
-                    }
-                }
-
-                console.log(that.poem.tb_fanyis.fanyis)
-                
+                console.log(res.data.tb_author.pic)
                 that.poemtags = res.data.tb_gushiwen.tag.split('|')
                 that.$apply()
             },
@@ -85,6 +77,7 @@ export default class PoemDetail extends wepy.page {
                 console.log(error)
             },
             complete: () => {
+                wepy.hideNavigationBarLoading();
             }
         })
     }

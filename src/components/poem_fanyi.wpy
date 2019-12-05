@@ -1,9 +1,9 @@
 <template>
     <view class="fanyi_container">
-        <repeat for="{{poemFanyi.tb_fanyis.fanyis}}" item="fanyi" key="fanyi.id">
+        <repeat for="{{poemFanyi.tb_fanyis.fanyis}}" item="fanyi" key="index">
             <view class="fanyi_title">{{fanyi.nameStr}}</view>
             <rich-text nodes="{{fanyi.cont}}"></rich-text>
-            <block wx:if="{{fanyi.cankao !== '0'}}">
+            <block wx:if="{{fanyi.cankao !== '0' && fanyi.cankao.length > 0}}">
                 <view class="fanyi_cankao">[参考]{{fanyi.cankao}}</view>
             </block>
         </repeat>
@@ -25,6 +25,7 @@ export default class PoemFanyi extends wepy.component{
     padding: 0px 15px 80px 15px;
     .fanyi_title {
         padding-bottom: 10px;
+        margin-bottom: 10px;
         font-size: 16px;
         font-weight: bold;
         color: palevioletred;
@@ -32,14 +33,14 @@ export default class PoemFanyi extends wepy.component{
         border-bottom-style: dotted;
     }
 
-    .fanyi_strong {
-        padding-top: 150px;
-        padding-bottom: 10px;
+    rich-text{
+        line-height: 25px;
     }
     
     .fanyi_cankao {
-        font-weight: bold;
-        color: blue;
+        padding-top: 15px;
+        font-size: 13px;
+        color: gray;
     }
 }
 </style>

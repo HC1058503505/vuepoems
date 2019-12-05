@@ -1,17 +1,63 @@
-<template>
-    <view>
-        Author
+<template lang="wxml">
+    <view class="author_container" wx:if="{{poemAuthor.tb_author.idnew != null}}">
+        <view class="author_pic_container" wx:if="{{ poemAuthor.tb_author.pic.length > 0 }}">
+            <image class="author_pic" src="{{ 'https://song.gushiwen.org/authorImg/' + poemAuthor.tb_author.pic + '.jpg' }}"></image>
+        </view>
+         <view class="author_info">
+            {{poemAuthor.tb_author.cont}}
+            <view class="shi_count" @tap="showMorePoems">>> {{poemAuthor.tb_author.shiCount}}篇诗文</view>
+        </view>
     </view>
+    <view class="yi_ming" wx:else>佚名</view>
 </template>
 
 <script>
 import wepy from 'wepy'
 export default class PoemAuthor extends wepy.component{
-    
+    props = {
+        poemAuthor: Object
+    }
+
+    methods = {
+        showMorePoems () {
+            console.log(this.poemAuthor.tb_author)
+        }   
+    }
 }
 </script>
 
 
 <style lang="less" scoped>
+.author_pic_container {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    .author_pic {
+        margin-top: 20px;
+        box-shadow: 0px 0px 20px lightgray;
+        border-radius: 52.5px;
+        width: 105px;
+        height: 150px;
+    }
+}
 
+.author_info {
+    line-height: 25px;
+    padding-top: 20px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.shi_count {
+    display: inline;
+    color: #2A537A;
+}
+
+.yi_ming {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    padding-top: 50px;
+    color: gray;
+}
 </style>

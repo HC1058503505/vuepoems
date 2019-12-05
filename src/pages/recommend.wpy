@@ -1,5 +1,5 @@
 <template>
-    <repeat for="{{poems}}" item="poem" key="poem.idnew" index="index">
+    <repeat for="{{poems}}" item="poem" key="index" index="index">
         <poemcell :poemData="poem"></poemcell>
     </repeat>
 </template>
@@ -74,8 +74,7 @@ export default class Recommend extends wepy.page{
                 token: 'gswapi'
             },
             url: 'https://appbei.gushiwen.cn/api/onehour/Default.aspx',
-            complete: (res) => {
-                wepy.hideNavigationBarLoading()
+            success: (res) => {
                 if(callback) {
                     callback(res.data.gushiwens)
                     return
@@ -90,6 +89,20 @@ export default class Recommend extends wepy.page{
                 that.currentPage = that.currentPage + 1
                 that.sumPage = res.data.sumPage
                 that.$apply()
+            },
+            fail: (error) => {
+                console.log(error)
+                wepy.showToast({
+                  title: '请求失败', //提示的内容,
+                  icon: 'error', //图标,
+                  duration: 2000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {}
+                });
+                
+            },
+            complete: () => {
+                wepy.hideNavigationBarLoading()
             }
         }) 
     }

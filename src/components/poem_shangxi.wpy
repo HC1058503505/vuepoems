@@ -1,10 +1,10 @@
 <template>
-    <view>
-        <repeat for="{{poemShangxi.tb_shangxis.shangxis}}" item="shangxi" key="shangxi.id">
-            <view>{{shangxi.nameStr}}</view>
+    <view class="shangxi_container">
+        <repeat for="{{poemShangxi.tb_shangxis.shangxis}}" item="shangxi" key="index">
+            <view class="shangxi_title">{{shangxi.nameStr}}</view>
             <rich-text nodes="{{shangxi.cont}}"></rich-text>
-            <block wx:if="{{shangxi.cankao !== '0'}}">
-                <view>{{shangxi.cankao}}</view>
+            <block wx:if="{{shangxi.cankao !== '0' && shangxi.cankao.length > 0}}">
+                <view class="shangxi_cankao">[参考]{{shangxi.cankao}}</view>
             </block>
         </repeat>
     </view>
@@ -21,5 +21,27 @@ export default class PoemShangxi extends wepy.component{
 
 
 <style lang="less" scoped>
+.shangxi_container {
+    padding: 10px 15px 80px 15px;
+    .shangxi_title {
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        color: palevioletred;
+        border-bottom-color: gainsboro;
+        border-bottom-style: dotted;
+    }
 
+    rich-text{
+        line-height: 25px;
+    }
+    
+    .shangxi_cankao {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        font-size: 13px;
+        color: gray;
+    }
+}
 </style>
