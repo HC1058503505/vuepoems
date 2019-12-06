@@ -22,7 +22,7 @@ export default class PoemFanyi extends wepy.component{
 
 <style lang="less" scoped>
 .fanyi_container {
-    padding: 0px 15px 80px 15px;
+    padding: 0px 15px 0px 15px;
     .fanyi_title {
         padding-bottom: 10px;
         margin-bottom: 10px;

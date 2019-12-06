@@ -1,25 +1,26 @@
 <template lang="wxml">
-    <block wx:if="{{selectedIndex == 0}}">
-        <poemCont :poemData.sync="poem"></poemCont>
-        <poemTags :poemTags.sync="poemtags"></poemTags>
-    </block>
-    <block wx:elif="{{selectedIndex == 1}}">
-        <poemFanyi :poemFanyi.sync="poem"></poemFanyi>
-    </block>
-    <block wx:elif="{{selectedIndex == 2}}">
-        <poemShangxi :poemShangxi.sync="poem"></poemShangxi>
-    </block>
-    <block wx:else>
-        <poemAuthor :poemAuthor.sync="poem"></poemAuthor>
-    </block>
-    
+    <view class="detail_container">
+        <block wx:if="{{selectedIndex == 0}}">
+            <poemCont :poemData.sync="poem"></poemCont>
+            <poemTags :poemTags.sync="poemtags"></poemTags>
+        </block>
+        <block wx:elif="{{selectedIndex == 1}}">
+            <poemFanyi :poemFanyi.sync="poem"></poemFanyi>
+        </block>
+        <block wx:elif="{{selectedIndex == 2}}">
+            <poemShangxi :poemShangxi.sync="poem"></poemShangxi>
+        </block>
+        <block wx:else>
+            <poemAuthor :poemAuthor.sync="poem"></poemAuthor>
+        </block>
+    </view>
     
     <bottomTabBar :poemData.sync="poem"></bottomTabBar>
 </template>
 
 <script>
 import wepy from 'wepy'
-import request from '../request/request.js'
+import Request from '../request/request.js'
 import PoemContCom from '../components/poemcont'
 import PoemTagsCom from '../components/poemtags'
 import BottomTabBarCom from '../components/bottomtabbar'
@@ -46,7 +47,7 @@ export default class PoemDetail extends wepy.page {
     events = {
         'selectedBarItem': (index) => {
             this.selectedIndex = index
-        }
+        },
     }
 
     onLoad(params, data) {
@@ -59,7 +60,7 @@ export default class PoemDetail extends wepy.page {
         wepy.showNavigationBarLoading();
         
         let that = this
-        request({
+        Request({
             url: '/api/shiwen/shiwenv3.aspx',
             method: 'post',
             data: {token: 'gswapi', id: data.preload.poem.idnew},
@@ -67,9 +68,7 @@ export default class PoemDetail extends wepy.page {
                 'content-type': 'application/x-www-form-urlencoded',
             },
             success: (res) => {
-                // res.data.tb_author.pic =  'https://song.gushiwen.org/authorImg/' + res.data.tb_author.pic + '.jpg'
                 that.poem = res.data
-                console.log(res.data.tb_author.pic)
                 that.poemtags = res.data.tb_gushiwen.tag.split('|')
                 that.$apply()
             },
@@ -84,3 +83,8 @@ export default class PoemDetail extends wepy.page {
 }
 </script>
 
+<style lang="less" scoped>
+.detail_container {
+    padding-bottom: 85px;
+}
+</style>

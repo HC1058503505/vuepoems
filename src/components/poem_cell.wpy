@@ -7,8 +7,10 @@
 
 .poem_author_info {
     text-align: center;
-    font: smaller;
+    font-size: 15px;
     color: #8a8a8a;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .poem_cont {
@@ -45,9 +47,13 @@
 <script>
 import wepy from 'wepy'
 export default class PoemCell extends wepy.component{
+  props = {
+      poemData: Object
+  }
   methods = {
-      tapPoemCell: function(value){
-          this.$emit('tapPoemCell', value.currentTarget.dataset.comIndex)
+      tapPoemCell: function(){
+        this.$parent.$preload("poem", this.poemData)
+        wepy.navigateTo({ url: '/pages/poemdetail'})
       }
   }
   

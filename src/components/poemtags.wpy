@@ -1,7 +1,7 @@
-<template>
+<template lang="wxml">
     <view class="poem_tag_container">
         <repeat for="{{poemTags}}" item="tag" key="tag">
-            <view class="tag_item">{{tag}}</view>
+            <view class="tag_item" @tap="showTag({{tag}})">{{tag}}</view>
         </repeat>
     </view>
 </template>
@@ -12,6 +12,12 @@ import wepy from 'wepy'
 export default class PoemTags extends wepy.component {
     props = {
         poemTags: [String]
+    }
+
+    methods = {
+        showTag (tag) {
+            wepy.navigateTo({ url: './tagpoems?type=tag&tagstr=' + tag})
+        }
     }
     
     onLoad () {

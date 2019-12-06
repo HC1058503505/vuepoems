@@ -1,0 +1,59 @@
+<template>
+    <view class="tag_poem_container" @tap="tapTagPoemCell">
+        <view class="tag_poem_title">{{poemData.nameStr}}
+            <view class="tag_poem_chaodai_author">{{poemData.chaodai + '/' + poemData.author}}</view>
+        </view>
+        
+        <rich-text class="tag_poem_cont" nodes="{{poemData.firstSentence}}"></rich-text>
+    </view>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+export default class TagPoemCell extends wepy.component{
+    props = {
+        poemData: Object
+    }
+
+    methods = {
+        tapTagPoemCell () {
+            if (this.$parent.$isComponent) {
+                this.$parent.$parent.$preload("poem", this.poemData)
+            } else {
+                this.$parent.$preload("poem", this.poemData)
+            }
+            wepy.navigateTo({ url: '/pages/poemdetail'})
+        }
+    }
+    onLoad() {
+
+    }
+}
+</script>
+
+
+<style lang="less" scoped>
+
+.tag_poem_container {
+    border-bottom: solid 1px lightgray;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding: 10px;
+    .tag_poem_title {
+        font-weight: bold;
+        padding-bottom: 10px;
+    }
+    .tag_poem_chaodai_author {
+        font-size: 14px;
+        display: inline;
+        color: gray;
+        font-weight: normal;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .tag_poem_cont {
+        font-size: 14px;
+    }
+}
+</style>

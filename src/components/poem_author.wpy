@@ -3,61 +3,184 @@
         <view class="author_pic_container" wx:if="{{ poemAuthor.tb_author.pic.length > 0 }}">
             <image class="author_pic" src="{{ 'https://song.gushiwen.org/authorImg/' + poemAuthor.tb_author.pic + '.jpg' }}"></image>
         </view>
-         <view class="author_info">
-            {{poemAuthor.tb_author.cont}}
-            <view class="shi_count" @tap="showMorePoems">>> {{poemAuthor.tb_author.shiCount}}篇诗文</view>
+        <view class="section_title">简介</view>
+        <view class="author_info">
+            <rich-text nodes="{{poemAuthor.tb_author.cont}}">
+            </rich-text>
         </view>
+        <block wx:if="{{!authorMoreInfo}}">
+            <view class="author_more_info" @tap="showMoreAuthorInfo">
+                查看更多信息
+            </view>
+        </block>
+
+        <block wx:else>
+            <view class="magnum_opus_section">
+                <view class="section_title">代表作</view>
+                <!--代表作列表-->
+                <view class="magnum_opus">
+                    <repeat for="{{authorMoreInfo.tb_gushiwens.gushiwens}}" key="index" index="index" item="gushiwen">
+                        <tagPoemCell :poemData.sync="gushiwen"></tagPoemCell>
+                    </repeat>
+                </view>
+                <view class="shi_count" @tap="showMorePoems">{{poemAuthor.tb_author.shiCount}}篇诗文>></view>
+            </view>
+
+            <view class="life_experince_section">
+                <repeat for="{{authorMoreInfo.tb_ziliaos.ziliaos}}" key="index" index="index" item="ziliao">
+                    <view class="section_title">{{ziliao.nameStr}}</view>
+                    <rich-text nodes="{{ziliao.cont}}"></rich-text>
+                    <block wx:if="{{ziliao.cankao}}">
+                        <view class="ziliao_cankao">[参考]{{ziliao.cankao}}</view>
+                    </block>
+                </repeat>
+            </view>
+        </block>
+        
     </view>
     <view class="yi_ming" wx:else>佚名</view>
 </template>
 
 <script>
 import wepy from 'wepy'
+import WXParse from '../wxParse/wxParse.js'
+import Request from '../request/request.js'
+import TagPoemCellCom from '../components/tap_poem_cell'
 export default class PoemAuthor extends wepy.component{
+    components = {
+        tagPoemCell: TagPoemCellCom
+    }
+
     props = {
-        poemAuthor: Object
+        poemAuthor: Object,
+        authorMoreInfo: Object
     }
 
     methods = {
         showMorePoems () {
-            console.log(this.poemAuthor.tb_author)
-        }   
+            wepy.navigateTo({ url: '../pages/tagpoems?type=poetry&tagstr=' + this.poemAuthor.tb_author.nameStr + '&idnew=' + this.poemAuthor.tb_author.idnew });
+        },
+
+        showMoreAuthorInfo () {
+            wepy.showNavigationBarLoading();
+            let that = this
+            Request({
+                url: '/api/author/author2.aspx',
+                method: 'post',
+                data: {token: 'gswapi', id: this.poemAuthor.tb_author.idnew},
+                header: {
+                    'content-type': 'application/x-www-form-urlencoded'
+                },
+                success: (res) => {
+                    console.log(res)
+                    let gushiwens = res.data.tb_gushiwens.gushiwens
+                    gushiwens.forEach(element => {
+                        let elementCont = element.cont
+                        let contentNodes = WXParse.wxParse('contnodes', 'html', elementCont, that).contnodes
+
+                        let nodeIndex = 0
+                        while (contentNodes.hasOwnProperty('nodes')) {
+                            let nodeElement = contentNodes.nodes[nodeIndex]
+
+                            if (nodeElement.node === "text") {
+                                element.firstSentence = nodeElement.text
+                                break
+                            } else if (nodeElement.hasOwnProperty('nodes')) {
+                                contentNodes = nodeElement
+                                nodeIndex = 0
+                                continue
+                            } 
+                            
+                            nodeIndex = nodeIndex + 1
+                        }
+                    });
+                    that.authorMoreInfo = res.data
+                    that.$apply()
+                },
+                fail: () => {
+                    wepy.showToast({
+                      title: '获取诗人信息失败', //提示的内容,
+                      icon: 'error', //图标,
+                      duration: 2000, //延迟时间,
+                      mask: true, //显示透明蒙层，防止触摸穿透,
+                      success: res => {}
+                    });
+                },
+                complete: () => {
+                    wepy.hideNavigationBarLoading();
+                }
+            })
+        }
     }
 }
 </script>
 
 
 <style lang="less" scoped>
-.author_pic_container {
-    display: flex;
-    display: -webkit-flex;
-    justify-content: center;
-    .author_pic {
-        margin-top: 20px;
-        box-shadow: 0px 0px 20px lightgray;
-        border-radius: 52.5px;
-        width: 105px;
-        height: 150px;
+
+.author_container {
+    padding:  10px;
+    .author_pic_container {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: center;
+        
+        .author_pic {
+            margin-top: 20px;
+            box-shadow: 0px 0px 20px lightgray;
+            border-radius: 52.5px;
+            width: 105px;
+            height: 150px;
+        }
+        
+    }
+
+    .section_title {
+        font-size: 25px;
+        font-weight: bold;
+        border-bottom: dotted 1px gray;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+        padding-top: 10px;
+    }
+
+    .author_info {
+        line-height: 25px;
+    }
+
+    .magnum_opus_section {
+        .shi_count {
+            padding-top: 10px;
+            color: #2A537A;
+            font-weight: bold;
+        }
+
+        
+    }
+
+    .life_experince_section {
+        .ziliao_cankao {
+            padding-top: 15px;
+            font-size: 13px;
+            color: gray;
+            padding-bottom: 15px;
+        }
+    }
+
+    .yi_ming {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: center;
+        padding-top: 50px;
+        color: gray;
+    }
+
+    .author_more_info {
+        padding-top: 20px;
+        padding-left: 15px;
+        color: #2A537A;
+        text-align: center;
     }
 }
 
-.author_info {
-    line-height: 25px;
-    padding-top: 20px;
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-.shi_count {
-    display: inline;
-    color: #2A537A;
-}
-
-.yi_ming {
-    display: flex;
-    display: -webkit-flex;
-    justify-content: center;
-    padding-top: 50px;
-    color: gray;
-}
 </style>

@@ -22,7 +22,7 @@ export default class PoemShangxi extends wepy.component{
 
 <style lang="less" scoped>
 .shangxi_container {
-    padding: 10px 15px 80px 15px;
+    padding: 10px 15px 0px 15px;
     .shangxi_title {
         padding-bottom: 10px;
         margin-bottom: 10px;
