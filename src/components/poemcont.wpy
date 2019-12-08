@@ -1,30 +1,495 @@
 <template>
     <block wx:if="{{ poemData.tb_gushiwen }}">
-        <view class="poem_cont_container">
+        <view class="poem_cont_container" >
                 <view class="poem_cont_tools">
-                    <image src="../images/no_collection.png" alt=""/> 
-                    <image src="../images/share.png" alt=""/>
-                    <image src="../images/more.png" alt=""/>
+                    
+                    <button class="action_btn" @tap="collectionAction" open-type="getUserInfo">
+                        <image class="action_img" src="{{isCollection ? '../images/yes_collection.png' : '../images/no_collection.png'}}"  /> 
+                    </button>
+
+                    <button class="action_btn" open-type='share'>
+                        <image class="action_img" src="../images/share.png"/>
+                    </button>
+                    <image class="more_img" src="../images/more.png" @tap="moreAction"/>
                 </view>
                 <view class="poem_chaodai_author">{{poemData.tb_gushiwen.chaodai + '/' + poemData.tb_gushiwen.author}}</view>
                 <view class="rich_cont_container">
                     <rich-text class="poem_cont" nodes="{{poemData.tb_gushiwen.cont}}"></rich-text>
                 </view>
         </view>
+        <canvas canvas-id="shareImg" class="canvas" style="width: {{width}}px; height: {{canvasH}}px; position: fixed; top: -199999rpx;" hidden="{{canvasHidden}}"></canvas>
     </block>
 </template>
 
 
 <script>
 import wepy from 'wepy'
+import WXParse from '../wxParse/wxParse.js'
+
 export default class PoemCont extends wepy.component {
-     props = {
-         poemData: Object
-     }
+    props = {
+        poemData: Object,
+    }
 
-     onLoad () {
+    data = {
+        poemStr: '',
+        isCollection: false,
+        width: 0,
+        height: 0,
+        canvasH: 0,
+        ratio_w: 0,
+        canvasHidden: true,
+        openid: '',
+        previewUrl: '',
+        doc_id: ''
+    }
 
-     }
+    watch = {
+        poemData: (newValue , oldValue) => {
+            if (!newValue) {
+                return
+            }
+
+            this.judgeCollection()
+
+            let tb_gushiwen = newValue.tb_gushiwen
+            let poemContNodes = WXParse.wxParse('poemCont', 'html', tb_gushiwen.cont, this).poemCont
+            this.poemSlices(poemContNodes)
+        }   
+    }
+
+    methods = {
+        collectionAction () {
+            let that = this
+            if (wepy.$instance.globalData.userInfo) {
+                if (wepy.$instance.globalData.openid === '') {
+                    wepy.$instance.getOpenId(() => {
+                        // 获取了openid
+                        that.judgeCollection()
+                    })
+                } else {
+                    that.collectionOrCancle()
+                }
+                return
+            } 
+
+            wepy.getUserInfo({
+              withCredentials: true,
+              success: res => {
+                wepy.$instance.globalData.userInfo = res.userInfo
+                if (wepy.$instance.globalData.openid === '') {
+                    wepy.$instance.getOpenId(() => {
+                        // 判断是否已收藏
+                        that.judgeCollection()
+                    })
+                }
+              },
+              fail: () => {
+              },   
+              complete: () => {
+
+              }
+            });
+        },
+        moreAction () {
+            if (this.canvasH == 0) {
+                this.canvasH = this.canvasWH().canvasH
+            }
+
+
+            let that = this
+            wepy.showActionSheet({
+              itemList: ['复制诗词', '生成图片'], //按钮的文字数组，数组长度最大为6个,
+              itemColor: '#000000', //按钮的文字颜色,
+              success: res => {
+                  switch (res.tapIndex) {
+                      case 0:
+                          that.copyPoemAction()
+                          break;
+                      default:
+                          wepy.shee
+                          that.generatePic()
+                          break;
+                  }
+              }
+            });
+            
+        }
+    }
+
+    poemSlices (poemContNodes) {
+        let nodeIndex = 0
+        let poemContStr = ''
+        while (poemContNodes.hasOwnProperty('nodes') && nodeIndex < poemContNodes.nodes.length) {
+            let nodeElement = poemContNodes.nodes[nodeIndex]
+            if (nodeElement.hasOwnProperty('node') && nodeElement.node === "text") {
+                poemContStr = poemContStr + '\n' + nodeElement.text 
+            } else if (nodeElement.hasOwnProperty('nodes')) {
+                // poemContNodes = nodeElement
+                // nodeIndex = 0
+                this.poemSlices(nodeElement)
+                // continue
+            } 
+            
+            nodeIndex = nodeIndex + 1
+        }
+
+        this.poemStr = this.poemStr + poemContStr
+    }
+
+    copyPoemAction () {
+        let tb_gushiwen = this.poemData.tb_gushiwen
+
+        let poemStr = tb_gushiwen.nameStr + '\n\n' 
+                        + tb_gushiwen.chaodai + '/' 
+                        + tb_gushiwen.author + '\n' 
+                        + this.poemStr
+        wepy.setClipboardData({
+          data: poemStr, //需要设置的内容,
+          success: res => {
+              wepy.showToast({
+                title: '复制成功', //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                mask: true, //显示透明蒙层，防止触摸穿透,
+                success: res => {}
+              });
+          }
+        });
+        
+    }
+     
+
+    async generatePic () {
+        if (this.previewUrl.length > 0) {
+            let that = this
+            wepy.previewImage({
+                urls: [that.previewUrl],
+                success: function() {
+                    that.$apply()
+                },
+                fail: function(err) {
+
+                }
+            })           
+            return
+        }
+
+        let windowW = this.width
+        let windowH = this.height
+        var scale = windowW / 750
+        let gushiwen = this.poemData.tb_gushiwen
+        let poem_title = gushiwen.nameStr
+        let poem_dynasty = gushiwen.chaodai
+        let poem_author = gushiwen.author
+        let poem_content = this.poemStr;
+
+        const ctx = wepy.createCanvasContext('shareImg', this)
+        ctx.setFillStyle('rgb(242, 242, 242)')
+        ctx.fillRect(0, 0, windowW, this.canvasH)
+        ctx.setTextAlign('center')
+
+
+        // poem_title
+        ctx.setFontSize(20)
+        ctx.setFillStyle('black')
+        const poem_title_H = this.canvasDrawText(ctx, poem_title, 50, true)
+
+        // poem_dynasty_author
+        ctx.setFontSize(15)
+        ctx.setFillStyle('grey')
+        const poem_author_H = this.canvasDrawText(ctx, poem_dynasty + '/' + poem_author, poem_title_H, true)
+
+        // poem_content
+        ctx.setFontSize(18)
+        ctx.setFillStyle('black')
+        this.canvasDrawText(ctx, poem_content, poem_author_H, true)
+
+        // canvas.draw 绘图结束后的回调再IOS上不执行，安卓手机未见此问题。
+
+        // 原因为：页面上设置了 wx: if  hidden，本想在绘图结束后再显示，不过再IOS11上不行。
+
+        // 解决办法：去掉hidden / wx: if   或者再draw之前显示页面，总之页面不显示没办法在IOS上执行draw的回调函数
+
+        // canvas画圆形的问题：
+
+        // 不写初始弧度在安卓手机上不能正常显示，在IOS手机上未见此问题。
+        // ————————————————
+        // 版权声明：本文为CSDN博主「胜天一子半」的原创文章，遵循CC 4.0 by - sa版权协议，转载请附上原文出处链接及本声明。
+        // 原文链接：https://blog.csdn.net/qq_37942845/article/details/80571251 
+    
+        this.canvasHidden = false
+        this.$apply()
+        await ctx.draw(true)
+        // ctx.draw(true, this.drawPicture(this))
+        wepy.showLoading({
+          title: '', //提示的内容,
+          mask: true, //显示透明蒙层，防止触摸穿透,
+          success: res => {}
+        });
+        
+        setTimeout(() => {
+            this.drawPicture()
+        }, 1000);
+    }
+
+    canvasWH () {
+
+        let windowW = this.width
+        let windowH = this.height
+        let gushiwen = this.poemData.tb_gushiwen
+        let poem_title = gushiwen.nameStr
+        let poem_dynasty = gushiwen.chaodai
+        let poem_author = gushiwen.author
+        let poem_content = this.poemStr;
+        const ctx = wx.createCanvasContext('shareImg', this)
+
+
+        // poem_title
+        ctx.setFontSize(20)
+        ctx.setFillStyle('black')
+        const poem_title_H = this.canvasDrawText(ctx, poem_title, 50, false)
+
+        // poem_dynasty_author
+        ctx.setFontSize(15)
+        ctx.setFillStyle('grey')
+        const poem_author_H = this.canvasDrawText(ctx, poem_dynasty + '/' + poem_author, poem_title_H, false)
+
+        // poem_content
+        ctx.setFontSize(18)
+        ctx.setFillStyle('black')
+        const poem_content_H = this.canvasDrawText(ctx, poem_content, poem_author_H, false)
+        let canvasH = poem_content_H
+        let canvasW = windowW
+
+        return {
+            'canvasH': canvasH,
+            'canvasW': canvasW
+        }
+    }
+
+    drawPicture () {
+
+        let windowW = this.width
+        let windowH = this.height
+
+        let that = this
+        wepy.canvasToTempFilePath({
+            x: 0,
+            y: 0,
+            width: windowW,
+            height: windowH,
+            destHeight: that.canvasH * that.ratio_w,
+            destWidth: windowW * that.ratio_w,
+            canvasId: 'shareImg',
+            quality: 1,
+            success: function(res) {
+                that.previewUrl = res.tempFilePath
+                wepy.hideLoading({
+                    success: () => {
+                        wepy.previewImage({
+                            urls: [that.previewUrl],
+                            success: function() {
+
+                                
+                            },
+                            fail: function(err) {
+
+                            }
+                        })
+                    }
+                });
+            },
+            fail: function(error){
+
+            },
+            complete: function(){
+                that.$apply()
+            }
+        }, that)
+    }
+
+    canvasDrawText (ctx, str, beginY, isFillText) {
+        const windowW = this.width
+        const windowH = this.height
+        const beginX = windowW * 0.5
+        const canvasMaxWidth = windowW - 40
+        const strList = str.split('\n')
+        for (var index in strList) {
+            let strItem = strList[index]
+            if (ctx.measureText(strItem).width <= canvasMaxWidth) {
+                if (isFillText) {
+                    ctx.fillText(strItem, beginX, beginY, canvasMaxWidth)
+                }
+                beginY += 30
+            } else {
+                beginY = this.canvasTextAutoLine(strItem, ctx, beginX, beginY, 30, isFillText)
+            }
+        }
+
+        return beginY
+    }
+
+    canvasTextAutoLine (str, ctx, initX, initY, lineHeight, isFillText) {
+        var lineWidth = 0;
+        var canvasWidth = this.width;
+        var lastSubStrIndex = 0;
+        for (let i = 0; i < str.length; i++) {
+        lineWidth += ctx.measureText(str[i]).width;
+        if (lineWidth > canvasWidth - 40) { //减去initX,防止边界出现的问题
+            if (isFillText) {
+                ctx.fillText(str.substring(lastSubStrIndex, i), initX, initY);
+            }
+
+            initY += lineHeight;
+            lineWidth = 0;
+            lastSubStrIndex = i;
+        }
+        if (i == str.length - 1 && isFillText) {
+            ctx.fillText(str.substring(lastSubStrIndex, i + 1), initX, initY);
+        }
+        }
+
+        return initY + lineHeight
+    }
+
+    judgeCollection () {
+        var that = this
+        if (!that.poemData) {
+            return
+        }
+
+        // 1. 获取数据库引用
+        const db = wx.cloud.database()
+        db.collection("poetry_collections").where({
+            _openid: wepy.$instance.globalData.openid,
+            poetry_id: that.poemData.tb_gushiwen.idnew
+        }).get({
+            success: function(res) {
+                that.isCollection = res.data.length > 0
+                that.doc_id = res.data[0]._id
+            },
+            fail: function(error) {
+            },
+            complete: function(res) {
+                that.$apply()
+            }
+        })
+    }
+
+    collectionOrCancle () {
+        if (this.isCollection) {
+            // 取消收藏
+            this.removeCollection()
+            return
+        }
+
+        // 添加收藏
+        this.addCollection()
+    }
+    addCollection () {
+        let poem_id = this.poemData.tb_gushiwen.idnew
+        let categorysearch = wx.getStorageSync("categorysearch")
+        var that = this
+        let gushiwen = this.poemData.tb_gushiwen
+
+        // 1. 获取数据库引用
+        const db = wx.cloud.database()
+        // 2. 构造查询语句
+        // collection 方法获取一个集合的引用
+        // where 方法传入一个对象，数据库返回集合中字段等于指定值的 JSON 文档。API 也支持高级的查询条件（比如大于、小于、in 等），具体见文档查看支持列表
+        // get 方法会触发网络请求，往数据库取数据
+        db.collection("poetry_collections").add({
+            data: {
+                poetry_id: poem_id,
+                poetry_name: gushiwen.nameStr,
+                poetry_dynasty: gushiwen.chaodai,
+                poetry_content: that.poemStr,
+                poetry_author: gushiwen.author,
+                poetry_collection_date: Date.parse(Date()),
+                poetry_search_type: categorysearch
+            },
+            success: function(res) {
+                that.isCollection = true
+                that.doc_id = res._id
+                that.$apply()
+                wx.showToast({
+                    title: '收藏成功',
+                    duration: 1500,
+                    mask: true,
+                    success: function(showOK) {
+                    },
+                    fail: function(res) {},
+                    complete: function(showFail) {},
+                })
+            },
+            fail: function(error) {
+                wx.showToast({
+                    title: '收藏失败',
+                    duration: 1500,
+                    mask: true,
+                    success: function(res) {},
+                    fail: function(res) {},
+                    complete: function(res) {},
+                })
+            }
+        })
+    }
+    removeCollection () {
+        let poemID = this.poemData.tb_gushiwen.idnew
+        var that = this
+
+        // 1. 获取数据库引用
+        const db = wx.cloud.database()
+        db.collection("poetry_collections").doc(that.doc_id).remove({
+            success(res) {
+                that.isCollection = false
+                that.$apply()
+                wx.showToast({
+                    title: '取消收藏',
+                    duration: 1500,
+                    mask: true,
+                    success: function(res) {
+                    },
+                })
+            },
+            fail(error) {
+
+                wx.showToast({
+                    title: '取消收藏失败',
+                    duration: 1500,
+                })
+            }
+        })
+    }
+    getOpenId () {
+        let that = this
+        wepy.getSetting({ success: res => {
+            if (res['scope.userInfo']) {
+                wx.cloud.callFunction({
+                    name: 'getUserId',
+                    complete: res => {
+                        that.openid = res.result.openid
+                        that.judgeCollection()
+                    }
+                })
+            }
+        }});
+    }
+
+    onLoad () {
+        wepy.getSystemInfo({ success: res => {
+            this.width = res.screenWidth;
+            this.height = res.screenHeight;
+            this.ratio_w = res.pixelRatio;
+        }});
+        
+        if (wepy.$instance.globalData.openid.length == 0) {
+            wepy.$instance.getOpenId()
+        } 
+        
+    }
+    
 }
 </script>
 
@@ -45,10 +510,29 @@ export default class PoemCont extends wepy.component {
         display: -webkit-flex;
         justify-content: flex-end;
         padding-bottom: 10px;
-        image {
-            width: 20px;
-            height: 20px;
-            padding-right: 20px;
+        .more_img {
+            width: 22px;
+            height: 22px;
+            padding-right: 10px;
+        }
+
+        button::after {
+            background: none !important;
+            border: none;
+        }
+
+        .action_btn {
+            padding: 0px;
+            margin: 0px;
+            font-size: 0px;
+            margin-right: 20px;
+        }
+
+        .action_img {
+            width: 22px;
+            height: 22px;
+            padding: 0px;
+            margin: 0px;
         }
     }
 

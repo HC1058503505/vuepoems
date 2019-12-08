@@ -1,7 +1,7 @@
 <template>
     <view class="shangxi_container">
         <repeat for="{{poemShangxi.tb_shangxis.shangxis}}" item="shangxi" key="index">
-            <view class="shangxi_title">{{shangxi.nameStr}}</view>
+            <view class="section_title">{{shangxi.nameStr}}</view>
             <rich-text nodes="{{shangxi.cont}}"></rich-text>
             <block wx:if="{{shangxi.cankao !== '0' && shangxi.cankao.length > 0}}">
                 <view class="shangxi_cankao">[参考]{{shangxi.cankao}}</view>
@@ -31,6 +31,15 @@ export default class PoemShangxi extends wepy.component{
         color: palevioletred;
         border-bottom-color: gainsboro;
         border-bottom-style: dotted;
+    }
+
+    .section_title {
+        font-size: 25px;
+        font-weight: bold;
+        border-bottom: dotted 1px gray;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+        padding-top: 20px;
     }
 
     rich-text{

@@ -47,29 +47,47 @@ export default class PoemDetail extends wepy.page {
     events = {
         'selectedBarItem': (index) => {
             this.selectedIndex = index
+            wepy.pageScrollTo({
+              scrollTop: 0, //滚动到页面的目标位置（单位px）,
+              duration: 0 //滚动动画的时长，默认300ms，单位 ms,
+            });
         },
     }
 
+    onShareAppMessage() {
+      return {
+        title: this.poem.tb_gushiwen.nameStr,
+        path: '/pages/poemdetail?idnew=' + this.poem.tb_gushiwen.idnew + '&nameStr=' + this.poem.tb_gushiwen.nameStr,
+        imageUrl: 'url',
+        success: res => {},
+        fail: () => {},
+        complete: () => {}
+      };
+    }
+
+    
+    
+
     onLoad(params, data) {
-        if(!data.preload.poem) {
+        if(!params.idnew) {
             return
         }
-
-        wepy.setNavigationBarTitle({ title: data.preload.poem.nameStr })
-        this.poem.tb_gushiwen = data.preload.poem
+        
+        // wepy.$instance.globalData
+        wepy.setNavigationBarTitle({ title: params.nameStr })
         wepy.showNavigationBarLoading();
         
         let that = this
         Request({
             url: '/api/shiwen/shiwenv3.aspx',
             method: 'post',
-            data: {token: 'gswapi', id: data.preload.poem.idnew},
+            data: {token: 'gswapi', id: params.idnew},
             header: {
                 'content-type': 'application/x-www-form-urlencoded',
             },
             success: (res) => {
                 that.poem = res.data
-                that.poemtags = res.data.tb_gushiwen.tag.split('|')
+                that.poemtags = res.data.tb_gushiwen.tag.length > 0 ? res.data.tb_gushiwen.tag.split('|') : [String]
                 that.$apply()
             },
             fail: (error) => {
@@ -77,6 +95,8 @@ export default class PoemDetail extends wepy.page {
             },
             complete: () => {
                 wepy.hideNavigationBarLoading();
+                // 短暂震动
+                wx.vibrateShort()
             }
         })
     }

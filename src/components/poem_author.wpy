@@ -1,4 +1,5 @@
 <template lang="wxml">
+    <!-----诗人简介---->
     <view class="author_container" wx:if="{{poemAuthor.tb_author.idnew != null}}">
         <view class="author_pic_container" wx:if="{{ poemAuthor.tb_author.pic.length > 0 }}">
             <image class="author_pic" src="{{ 'https://song.gushiwen.org/authorImg/' + poemAuthor.tb_author.pic + '.jpg' }}"></image>
@@ -15,28 +16,33 @@
         </block>
 
         <block wx:else>
+            <!-----人生履历---->
             <view class="magnum_opus_section">
                 <view class="section_title">代表作</view>
-                <!--代表作列表-->
                 <view class="magnum_opus">
                     <repeat for="{{authorMoreInfo.tb_gushiwens.gushiwens}}" key="index" index="index" item="gushiwen">
-                        <tagPoemCell :poemData.sync="gushiwen"></tagPoemCell>
+                        <!-- <authorPoemCell class="author" :poemData.sync="gushiwen"></authorPoemCell> -->
+                        <view class="tag_poem_container" @tap="tapTagPoemCell({{gushiwen}})">
+                            <view class="tag_poem_title">{{gushiwen.nameStr}}
+                                <view class="tag_poem_chaodai_author">{{gushiwen.chaodai + '/' + gushiwen.author}}</view>
+                            </view>
+                            <rich-text class="tag_poem_cont" nodes="{{gushiwen.firstSentence}}"></rich-text>
+                        </view>
                     </repeat>
                 </view>
                 <view class="shi_count" @tap="showMorePoems">{{poemAuthor.tb_author.shiCount}}篇诗文>></view>
             </view>
-
+            <!-----人生履历---->
             <view class="life_experince_section">
                 <repeat for="{{authorMoreInfo.tb_ziliaos.ziliaos}}" key="index" index="index" item="ziliao">
                     <view class="section_title">{{ziliao.nameStr}}</view>
                     <rich-text nodes="{{ziliao.cont}}"></rich-text>
-                    <block wx:if="{{ziliao.cankao}}">
+                    <block wx:if="{{ziliao.cankao !== '0' && ziliao.cankao.length > 0}}">
                         <view class="ziliao_cankao">[参考]{{ziliao.cankao}}</view>
                     </block>
                 </repeat>
             </view>
         </block>
-        
     </view>
     <view class="yi_ming" wx:else>佚名</view>
 </template>
@@ -45,10 +51,11 @@
 import wepy from 'wepy'
 import WXParse from '../wxParse/wxParse.js'
 import Request from '../request/request.js'
-import TagPoemCellCom from '../components/tap_poem_cell'
+import AuthorPoemCellCom from './tap_poem_cell'
 export default class PoemAuthor extends wepy.component{
+
     components = {
-        tagPoemCell: TagPoemCellCom
+        authorPoemCell: AuthorPoemCellCom
     }
 
     props = {
@@ -57,6 +64,9 @@ export default class PoemAuthor extends wepy.component{
     }
 
     methods = {
+        tapTagPoemCell (e) {
+            wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + e.idnew + '&nameStr=' + e.nameStr})
+        },
         showMorePoems () {
             wepy.navigateTo({ url: '../pages/tagpoems?type=poetry&tagstr=' + this.poemAuthor.tb_author.nameStr + '&idnew=' + this.poemAuthor.tb_author.idnew });
         },
@@ -72,7 +82,7 @@ export default class PoemAuthor extends wepy.component{
                     'content-type': 'application/x-www-form-urlencoded'
                 },
                 success: (res) => {
-                    console.log(res)
+
                     let gushiwens = res.data.tb_gushiwens.gushiwens
                     gushiwens.forEach(element => {
                         let elementCont = element.cont
@@ -108,6 +118,8 @@ export default class PoemAuthor extends wepy.component{
                 },
                 complete: () => {
                     wepy.hideNavigationBarLoading();
+                    // 短暂震动
+                    wx.vibrateShort()
                 }
             })
         }
@@ -126,7 +138,7 @@ export default class PoemAuthor extends wepy.component{
         justify-content: center;
         
         .author_pic {
-            margin-top: 20px;
+            margin-top: 10px;
             box-shadow: 0px 0px 20px lightgray;
             border-radius: 52.5px;
             width: 105px;
@@ -141,7 +153,7 @@ export default class PoemAuthor extends wepy.component{
         border-bottom: dotted 1px gray;
         padding-bottom: 5px;
         margin-bottom: 10px;
-        padding-top: 10px;
+        padding-top: 20px;
     }
 
     .author_info {
@@ -167,20 +179,42 @@ export default class PoemAuthor extends wepy.component{
         }
     }
 
-    .yi_ming {
-        display: flex;
-        display: -webkit-flex;
-        justify-content: center;
-        padding-top: 50px;
-        color: gray;
-    }
-
     .author_more_info {
         padding-top: 20px;
         padding-left: 15px;
         color: #2A537A;
         text-align: center;
     }
+
+    .tag_poem_container {
+        border-bottom: solid 1px lightgray;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding: 10px;
+        .tag_poem_title {
+            font-weight: bold;
+            padding-bottom: 10px;
+        }
+        .tag_poem_chaodai_author {
+            font-size: 14px;
+            display: inline;
+            color: gray;
+            font-weight: normal;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        .tag_poem_cont {
+            font-size: 14px;
+        }
+    }
 }
 
+
+.yi_ming {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    padding-top: 50px;
+    color: gray;
+}
 </style>

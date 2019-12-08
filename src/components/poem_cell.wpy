@@ -52,8 +52,8 @@ export default class PoemCell extends wepy.component{
   }
   methods = {
       tapPoemCell: function(){
-        this.$parent.$preload("poem", this.poemData)
-        wepy.navigateTo({ url: '/pages/poemdetail'})
+        // this.$parent.$preload("poem", this.poemData)
+        wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + this.poemData.idnew + '&nameStr=' + this.poemData.nameStr})
       }
   }
   

@@ -57,20 +57,51 @@ export default class extends wepy.app {
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: '小诗词',
       navigationBarTextStyle: 'black'
-    }
+    },
+    // sitemapLocation: 'sitemap.json'
   }
 
   globalData = {
-    userInfo: null
+    userInfo: null,
+    openid: ''
   }
 
   constructor () {
     super()
     this.use('requestfix')
+    // this.use('promisify')
+  }
+
+  
+  getOpenId (callback) {
+      let that = this
+      wepy.getSetting({ success: res => {
+          if (res.authSetting['scope.userInfo']) {
+              wx.cloud.callFunction({
+                  name: 'getUserId',
+                  complete: res => {
+                    that.globalData.openid = res.result.openid
+                    callback && callback()
+                  }
+              })
+          } 
+      }});
   }
 
   onLaunch() {
-    // this.testAsync()
+    this.testAsync()
+    wx.cloud.init({
+      env: {
+        database:"wepoems-2f5265"
+      },
+      traceUser: true
+    })
+
+    let that = this
+    this.getUserInfo(() => {
+      that.getOpenId()
+    })
+    
   }
 
   sleep (s) {
@@ -83,7 +114,6 @@ export default class extends wepy.app {
 
   async testAsync () {
     const data = await this.sleep(3)
-    console.log(data)
   }
 
   getUserInfo(cb) {

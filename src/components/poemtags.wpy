@@ -1,5 +1,5 @@
 <template lang="wxml">
-    <view class="poem_tag_container">
+    <view class="poem_tag_container" wx:if="{{poemTags.length > 0}}">
         <repeat for="{{poemTags}}" item="tag" key="tag">
             <view class="tag_item" @tap="showTag({{tag}})">{{tag}}</view>
         </repeat>

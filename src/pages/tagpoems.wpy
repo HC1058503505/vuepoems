@@ -92,6 +92,8 @@ export default class TagPoems extends wepy.page{
             complete: () => {
                 wepy.hideNavigationBarLoading();
                 wepy.stopPullDownRefresh();
+                // 短暂震动
+                wx.vibrateShort()
             }
         })
     }

@@ -12,7 +12,8 @@ import PoemCellCom from '../components/poem_cell'
 export default class Recommend extends wepy.page{
 
     config = {
-      enablePullDownRefresh: true
+      enablePullDownRefresh: true,
+      navigationBarTitleText: '推荐'
     }
 
     components = {
@@ -29,6 +30,17 @@ export default class Recommend extends wepy.page{
         this.loadMoreRecommendPoems()
     }
 
+    onShareAppMessage() {
+      return {
+        title: '小诗词--感受中国优秀传统文化魅力',
+        path: '/pages/recommend',
+        imageUrl: '../images/shici.png',
+        success: res => {},
+        fail: () => {},
+        complete: () => {}
+      };
+    }
+    
     onPullDownRefresh() {
         this.currentPage = 1
         let that = this
@@ -92,6 +104,8 @@ export default class Recommend extends wepy.page{
             },
             complete: () => {
                 wepy.hideNavigationBarLoading()
+                // 短暂震动
+                wx.vibrateShort()
             }
         }) 
     }

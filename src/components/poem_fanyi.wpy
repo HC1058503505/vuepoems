@@ -1,7 +1,7 @@
 <template>
     <view class="fanyi_container">
         <repeat for="{{poemFanyi.tb_fanyis.fanyis}}" item="fanyi" key="index">
-            <view class="fanyi_title">{{fanyi.nameStr}}</view>
+            <view class="section_title">{{fanyi.nameStr}}</view>
             <rich-text nodes="{{fanyi.cont}}"></rich-text>
             <block wx:if="{{fanyi.cankao !== '0' && fanyi.cankao.length > 0}}">
                 <view class="fanyi_cankao">[参考]{{fanyi.cankao}}</view>
@@ -31,6 +31,15 @@ export default class PoemFanyi extends wepy.component{
         color: palevioletred;
         border-bottom-color: gainsboro;
         border-bottom-style: dotted;
+    }
+
+    .section_title {
+        font-size: 25px;
+        font-weight: bold;
+        border-bottom: dotted 1px gray;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+        padding-top: 20px;
     }
 
     rich-text{
