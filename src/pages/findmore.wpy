@@ -1,12 +1,123 @@
-<template>
-    <view>FindMore</view>
+<template lang="wxml">
+    
+    <view class="search_container">
+        <icon type="search" size="24">
+        </icon>
+        <input type="text" placeholder="请输入关键字" placeholder-class="placeholder"
+        maxlength="140" bindconfirm="searckAction" disabled @tap="tapSearch"> 
+        </input>
+    </view>
+
+    <view class="hot_search_title">热搜标签</view>
+    <view class="hot_search_container">
+        <view class="poem_author">诗人</view>
+        <view class="dynasty">朝代</view>
+        <view class="tags">标签</view>
+        <view class="poem_album">诗集</view>
+    </view>
+    
 </template>
 
 
 <script>
 import wepy from 'wepy'
-
+import Request from '../request/request.js'
 export default class FindMore extends wepy.page{
-    
+    data = {
+
+    }
+
+    methods ={
+        tapSearch () {
+            wepy.navigateTo({ url: '/pages/searchmore' });
+        },
+        searckAction: (e) => {
+            console.log(e.detail.value)
+            if(e.detail.value.length == 0) {
+                wepy.showToast({
+                  title: '请输入关键字', //提示的内容,
+                  icon: 'none', //图标,
+                  duration: 2000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {}
+                })
+                return
+            }
+
+            Request({
+                url: '/api/ajaxSearch3.aspx',
+                data: {token: 'gswapi', valuekey: e.detail.value},
+                method: "POST",
+                header: {
+                'content-type': 'application/x-www-form-urlencoded'
+                },
+                success: (res) => {
+                    console.log(res)
+                },
+                fail: (error) => {
+
+                },
+                complete: () => {
+
+                }
+            })
+        }
+    }
 }
 </script>
+
+<style lang="less" scoped>
+input {
+    margin-left: 20rpx;
+    font-size: large;
+}
+
+.search_container {
+    height: 80rpx;
+    background-color: white;
+    margin: 40rpx;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    border: 2rpx solid lightgrey;
+    border-radius: 10rpx;
+    align-items: center;
+}
+
+icon {
+    margin-left: 20px;
+}
+
+.hot_search_title {
+    font: 20px bold;
+    color: grey;
+    padding-left: 20px;
+    padding-bottom: 20px;
+}
+
+.hot_search_container {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: space-around;
+}
+
+.poem_author {
+  color: red;
+  border-bottom: 2px solid red;
+}
+
+.dynasty {
+  color: blueviolet;
+  border-bottom: 2px solid blueviolet;
+}
+
+.tags {
+  color: orange;
+  border-bottom: 2px solid orange;
+}
+
+.poem_album {
+  color: cyan;
+  border-bottom: 2px solid cyan;
+}
+</style>

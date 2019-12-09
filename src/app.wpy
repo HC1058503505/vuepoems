@@ -26,7 +26,8 @@ export default class extends wepy.app {
       'pages/findmore',
       'pages/me',
       'pages/poemdetail',
-      'pages/tagpoems'
+      'pages/tagpoems',
+      'pages/searchmore'
     ],
     tabBar: {
       color: '#8A8A8A',

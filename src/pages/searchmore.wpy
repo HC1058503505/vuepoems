@@ -1,0 +1,97 @@
+<template lang="wxml">
+    <view class="search_container">
+        <icon type="search" size="24">
+        </icon>
+        <input type="text" placeholder="请输入关键字" placeholder-class="placeholder"
+        maxlength="140" bindconfirm="searckAction" auto-focus focus> 
+        </input>
+    </view>
+
+    
+    <repeat for="{{hotSearchKeys}}" key="index" index="index" item="item">
+        <view>{{item.title}}</view>
+        <view class="hot_items">
+            <repeat for="{{item.hotkeys}}" key="index" index="index" item="hotkey">
+            <repeat for="{{hotkey}}" key="index" index="index" item="hotkeyitem">
+                <view>{{hotkeyitem.name}}</view>
+            </repeat>
+        </repeat>
+        </view>
+    </repeat>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+export default class SearchMore extends wepy.page{
+
+    data = {
+        hotSearchKeys: [Object]
+    }
+
+    onLoad() {
+        this.requestHotSearchKeys()
+    }
+
+    requestHotSearchKeys () {
+        wepy.showNavigationBarLoading()
+        var that = this
+        // 1. 获取数据库引用
+        const db = wx.cloud.database()
+        // 2. 构造查询语句
+        // collection 方法获取一个集合的引用
+        // where 方法传入一个对象，数据库返回集合中字段等于指定值的 JSON 文档。API 也支持高级的查询条件（比如大于、小于、in 等），具体见文档查看支持列表
+        // get 方法会触发网络请求，往数据库取数据
+        // hostsearch
+        // search_conditions
+        db.collection('hostsearch').where({
+
+        }).get({
+            success: function (res) {
+                // 输出 [{ "title": "The Catcher in the Rye", ... }]
+                that.hotSearchKeys = res.data[0].hotsearch
+                that.$apply()
+            },
+            fail: function (error) {
+
+            },
+            complete: function () {
+                wepy.hideNavigationBarLoading()
+                wepy.vibrateShort()
+                console.log(that.hotSearchKeys)
+            }
+        })
+  }
+}
+</script>
+
+
+<style lang="less" scoped>
+
+.search_container {
+    height: 80rpx;
+    background-color: white;
+    margin: 40rpx;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    border: 2rpx solid lightgrey;
+    border-radius: 10rpx;
+    align-items: center;
+    input {
+        margin-left: 20rpx;
+        font-size: large;
+    }
+    icon {
+    margin-left: 20px;
+    }
+
+    .hot_items {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: flex-start;
+    }
+}
+
+
+</style>

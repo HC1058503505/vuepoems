@@ -17,7 +17,7 @@
                     <rich-text class="poem_cont" nodes="{{poemData.tb_gushiwen.cont}}"></rich-text>
                 </view>
         </view>
-        <canvas canvas-id="shareImg" class="canvas" style="width: {{width}}px; height: {{canvasH}}px; position: fixed; top: -199999rpx;" hidden="{{canvasHidden}}"></canvas>
+        <canvas canvas-id="shareImg" style="width: {{width}}px; height: {{canvasH}}px; position: fixed; top: -199999rpx;" hidden="{{canvasHidden}}"></canvas>
     </block>
 </template>
 
@@ -177,7 +177,6 @@ export default class PoemCont extends wepy.component {
 
         let windowW = this.width
         let windowH = this.height
-        var scale = windowW / 750
         let gushiwen = this.poemData.tb_gushiwen
         let poem_title = gushiwen.nameStr
         let poem_dynasty = gushiwen.chaodai
@@ -278,7 +277,7 @@ export default class PoemCont extends wepy.component {
             x: 0,
             y: 0,
             width: windowW,
-            height: windowH,
+            height: that.canvasH,
             destHeight: that.canvasH * that.ratio_w,
             destWidth: windowW * that.ratio_w,
             canvasId: 'shareImg',

@@ -15,7 +15,8 @@
 			"ignore": [],
 			"disablePlugins": [],
 			"outputPath": ""
-		}
+		},
+		"enhance": false
 	},
 	"compileType": "miniprogram",
 	"appid": "wxe57c9eee18f3a179",
@@ -23,5 +24,44 @@
 	"miniprogramRoot": "dist/",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
-	"condition": {}
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": []
+		},
+		"gamePlugin": {
+			"current": -1,
+			"list": []
+		},
+		"miniprogram": {
+			"current": -1,
+			"list": [
+				{
+					"id": 0,
+					"name": "pages/poemdetail",
+					"pathName": "pages/poemdetail",
+					"query": "idnew=05e2f6fc757c&nameStr= 梦游天姥吟留别 / 梦游天姥山别东鲁诸公",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/findmore",
+					"pathName": "pages/findmore",
+					"query": "",
+					"scene": null
+				}
+			]
+		}
+	}
 }
