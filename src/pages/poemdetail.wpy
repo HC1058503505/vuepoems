@@ -74,12 +74,18 @@ export default class PoemDetail extends wepy.page {
         }
         
         // wepy.$instance.globalData
-        wepy.setNavigationBarTitle({ title: params.nameStr })
+        if (params.nameStr) {
+            wepy.setNavigationBarTitle({ title: params.nameStr })
+        }
         wepy.showNavigationBarLoading();
         
+        let path = '/api/shiwen/shiwenv3.aspx'
+        if (params.type === 'mingju') {
+            path = '/api/mingju/juv2.aspx'
+        }
         let that = this
         Request({
-            url: '/api/shiwen/shiwenv3.aspx',
+            url: path,
             method: 'post',
             data: {token: 'gswapi', id: params.idnew},
             header: {
@@ -87,6 +93,7 @@ export default class PoemDetail extends wepy.page {
             },
             success: (res) => {
                 that.poem = res.data
+                wepy.setNavigationBarTitle({ title: that.poem.tb_gushiwen.nameStr })
                 that.poemtags = res.data.tb_gushiwen.tag.length > 0 ? res.data.tb_gushiwen.tag.split('|') : [String]
                 that.$apply()
             },

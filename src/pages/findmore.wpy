@@ -8,14 +8,28 @@
         </input>
     </view>
 
-    <view class="hot_search_title">热搜标签</view>
-    <view class="hot_search_container">
-        <view class="poem_author">诗人</view>
-        <view class="dynasty">朝代</view>
-        <view class="tags">标签</view>
-        <view class="poem_album">诗集</view>
+    <view wx-if="{{requestHotKeysFinished}}">
+        <view class="hot_search_title">热搜标签</view>
+        <view class="hot_search_container">
+            <view class="poem_author" @tap="tapHotSearchTag(0)">诗人</view>
+            <view class="dynasty" @tap="tapHotSearchTag(1)">朝代</view>
+            <view class="tags" @tap="tapHotSearchTag(2)">标签</view>
+            <view class="poem_album" @tap="tapHotSearchTag(3)">诗集</view>
+        </view>
     </view>
     
+    <view class="more_hot_keys">
+        <repeat for="{{hotSearchKeys}}" key="index" index="sectionIndex" item="item">
+            <view class="hot_search_title {{'more_hot_keys_' + sectionIndex}}">{{item.title}}</view>
+            <view class="hot_items">
+                <repeat for="{{item.hotkeys}}" key="index" index="index" item="hotkey">
+                    <repeat for="{{hotkey}}" key="index" index="index" item="hotkeyitem">
+                        <view class="key_item" @tap="tapHotSearchKey({{hotkeyitem.name}}, {{sectionIndex}})">{{hotkeyitem.name}}</view>
+                    </repeat>
+                </repeat>
+            </view>
+        </repeat>
+    </view>
 </template>
 
 
@@ -24,44 +38,67 @@ import wepy from 'wepy'
 import Request from '../request/request.js'
 export default class FindMore extends wepy.page{
     data = {
-
+        hotSearchKeys: [Object],
+        requestHotKeysFinished: false
     }
 
     methods ={
+        tapHotSearchTag (index) {
+            wepy.navigateTo({ url: '/pages/hotsearchcategories?pageindex=' + index });
+            
+        },
+        tapHotSearchKey (key, sectionIndex) {
+            console.log('/pages/tagpoems?tagstr=' + key +'&type=' + sectionIndex)
+            let typeStr = ''
+            if (sectionIndex == 0) {
+                typeStr = 'poetry'
+            } else if (sectionIndex == 1) {
+                typeStr = 'dynasty'
+            } else if (sectionIndex == 2) {
+                typeStr = 'tag'
+            } else {
+                typeStr = 'poemalbum'
+            }
+            wepy.navigateTo({ url: '/pages/tagpoems?tagstr=' + key +'&type=' + typeStr });
+            
+        },
         tapSearch () {
             wepy.navigateTo({ url: '/pages/searchmore' });
-        },
-        searckAction: (e) => {
-            console.log(e.detail.value)
-            if(e.detail.value.length == 0) {
-                wepy.showToast({
-                  title: '请输入关键字', //提示的内容,
-                  icon: 'none', //图标,
-                  duration: 2000, //延迟时间,
-                  mask: true, //显示透明蒙层，防止触摸穿透,
-                  success: res => {}
-                })
-                return
-            }
-
-            Request({
-                url: '/api/ajaxSearch3.aspx',
-                data: {token: 'gswapi', valuekey: e.detail.value},
-                method: "POST",
-                header: {
-                'content-type': 'application/x-www-form-urlencoded'
-                },
-                success: (res) => {
-                    console.log(res)
-                },
-                fail: (error) => {
-
-                },
-                complete: () => {
-
-                }
-            })
         }
+    }
+
+    onLoad() {
+        this.requestHotSearchKeys()
+    }
+    requestHotSearchKeys () {
+        wepy.showNavigationBarLoading()
+        var that = this
+        // 1. 获取数据库引用
+        const db = wx.cloud.database()
+        // 2. 构造查询语句
+        // collection 方法获取一个集合的引用
+        // where 方法传入一个对象，数据库返回集合中字段等于指定值的 JSON 文档。API 也支持高级的查询条件（比如大于、小于、in 等），具体见文档查看支持列表
+        // get 方法会触发网络请求，往数据库取数据
+        // hostsearch
+        // search_conditions
+        db.collection('hostsearch').where({
+
+        }).get({
+            success: function (res) {
+                // 输出 [{ "title": "The Catcher in the Rye", ... }]
+                that.hotSearchKeys = res.data[0].hotsearch
+                console.log(res)
+            },
+            fail: function (error) {
+
+            },
+            complete: function () {
+                that.requestHotKeysFinished = true
+                wepy.hideNavigationBarLoading()
+                wepy.vibrateShort()
+                that.$apply()
+            }
+        })
     }
 }
 </script>
@@ -92,7 +129,8 @@ icon {
     font: 20px bold;
     color: grey;
     padding-left: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 15px;
+    padding-top: 15px;
 }
 
 .hot_search_container {
@@ -120,4 +158,37 @@ icon {
   color: cyan;
   border-bottom: 2px solid cyan;
 }
+
+.more_hot_keys {
+    padding: 10px 20px 10px 20px;
+    .more_hot_keys_0 {
+        padding-left: 0px;
+    }
+    .more_hot_keys_1 {
+        padding-left: 0px;
+    }
+    .more_hot_keys_2 {
+        padding-left: 0px;
+    }
+    .more_hot_keys_3 {
+        padding-left: 0px;
+    }
+    
+    .hot_items {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        .key_item {
+            display: inline;
+            padding: 5px;
+            margin: 5px;
+            border: 1px solid gainsboro;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+    }
+}
+
+
 </style>

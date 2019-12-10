@@ -16,7 +16,7 @@ export default class PoemTags extends wepy.component {
 
     methods = {
         showTag (tag) {
-            wepy.navigateTo({ url: './tagpoems?type=tag&tagstr=' + tag})
+            wepy.navigateTo({ url: '/pages/tagpoems?type=tag&tagstr=' + tag})
         }
     }
     

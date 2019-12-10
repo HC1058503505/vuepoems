@@ -60,6 +60,19 @@
 					"pathName": "pages/findmore",
 					"query": "",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/findmore",
+					"pathName": "pages/findmore",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/searchmore",
+					"pathName": "pages/searchmore",
+					"scene": null
 				}
 			]
 		}

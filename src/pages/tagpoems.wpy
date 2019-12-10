@@ -21,7 +21,7 @@ export default class TagPoems extends wepy.page{
         poems: [],
         total_page: 1,
         params: Object,
-        page_num: 1
+        page_num: 1,
     }
 
     methods = {
@@ -32,16 +32,20 @@ export default class TagPoems extends wepy.page{
         wepy.showNavigationBarLoading();
         let that = this
         let postData = {token: 'gswapi', page: this.page_num}
-        let path = ''
-        if (this.params.type === 'tag') {
+        let path = '/api/shiwen/Default.aspx'
+
+        if (this.params.type === 'tag' || this.params.type === 'poemalbum') {
             postData['id'] = ''
             postData['pwd'] = ''
             postData['tstr'] = this.params.tagstr
-            path = '/api/shiwen/Default.aspx'
         } else if (this.params.type === 'poetry') {
-            postData['id'] = this.params.idnew
-            path = '/api/author/authorsw2.aspx'
-        }
+            postData['astr'] = this.params.tagstr
+        } else if (this.params.type == 'dynasty') {
+            postData['id'] = ''
+            postData['pwd'] = ''
+            postData['cstr'] = this.params.tagstr
+        } 
+        
 
         
         Request({
@@ -102,12 +106,16 @@ export default class TagPoems extends wepy.page{
             return
         }
         this.params = params
-
+        
         let titleType = '标签.'
         if (params.type === 'poetry') {
             titleType = '诗人.'
+        } else if (params.type === 'poemalbum') {
+            titleType = '诗集.'
+        } else if (params.type === 'dynasty') {
+            titleType = '朝代.'
         }
-        wepy.setNavigationBarTitle({ title: '标签.' + params.tagstr });
+        wepy.setNavigationBarTitle({ title: titleType + params.tagstr });
         this.loadMore()
     }
 

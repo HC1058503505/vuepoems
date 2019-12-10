@@ -6,62 +6,105 @@
         maxlength="140" bindconfirm="searckAction" auto-focus focus> 
         </input>
     </view>
-
-    
-    <repeat for="{{hotSearchKeys}}" key="index" index="index" item="item">
-        <view>{{item.title}}</view>
-        <view class="hot_items">
-            <repeat for="{{item.hotkeys}}" key="index" index="index" item="hotkey">
-            <repeat for="{{hotkey}}" key="index" index="index" item="hotkeyitem">
-                <view>{{hotkeyitem.name}}</view>
+    <view class="search_result_container">
+        <view wx:if="{{searchResult.authors.length > 0}}">
+            <view class="section_title">诗人</view>
+            <repeat for="{{searchResult.authors}}" key="index" index="index" item="author">
+                <view class="result_cell" @tap="tapSearchResultItem('authorInfo', {{author.idnew}}, {{author.nameStr}})">{{author.nameStr}}</view>
             </repeat>
-        </repeat>
         </view>
-    </repeat>
+
+        <view wx:if="{{searchResult.gushiwens.length > 0}}">
+            <view class="section_title">诗词</view>
+            <repeat for="{{searchResult.gushiwens}}" key="index" index="index" item="gushiwen">
+                <view class="result_cell" @tap="tapSearchResultItem('gushiwen', {{gushiwen.idnew}}, {{gushiwen.nameStr}})">
+                <view class="poem_sen">{{gushiwen.nameStr}}</view>
+                <view class="poem_autor">{{gushiwen.author}}</view>
+                </view>
+            </repeat>
+        </view>
+
+        <view wx:if="{{searchResult.mingjus.length > 0}}">
+            <view class="section_title">名句</view>
+            <repeat for="{{searchResult.mingjus}}" key="index" index="index" item="mingju">
+                <view class="result_cell" @tap="tapSearchResultItem('mingju', {{mingju.idnew}}, {{mingju.nameStr}})">{{mingju.nameStr}}</view>
+            </repeat>
+        </view>
+
+        <view wx:if="{{searchResult.books.length > 0}}">
+            <view class="section_title">诗集</view>
+            <repeat for="{{searchResult.books}}" key="index" index="index" item="book">
+                <view class="result_cell" @tap="tapSearchResultItem('book', {{book.idnew}}, {{book.nameStr}})">{{book.nameStr}}</view>
+            </repeat>
+        </view>
+
+        <view wx:if="{{searchResult.zhuantis.length > 0}}">
+            <view class="section_title">专题</view>
+            <repeat for="{{searchResult.zhuantis}}" key="index" index="index" item="专题">
+                <view class="result_cell" @tap="">{{zhuantis.nameStr}}</view>
+            </repeat>
+        </view>
+    </view>
 </template>
 
 
 <script>
 import wepy from 'wepy'
+import Request from '../request/request.js'
 export default class SearchMore extends wepy.page{
 
     data = {
-        hotSearchKeys: [Object]
+        searchResult: Object
+    }
+
+    methods = {
+        tapSearchResultItem (type, key, value) {
+            console.log(type, key, value)
+            if (type === 'authorInfo') {
+
+            } else if (type === 'gushiwen') {
+                wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + key + '&nameStr=' + value });
+            } else if (type === 'mingju') {
+                wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + key + '&nameStr=' + '' + '&type=mingju' });
+            } else if (type === 'book') {
+
+            }
+        },
+        searckAction (e) {
+            if(e.detail.value.length == 0) {
+                wepy.showToast({
+                  title: '请输入关键字', //提示的内容,
+                  icon: 'none', //图标,
+                  duration: 2000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {}
+                })
+                return
+            }
+            let that = this
+            Request({
+                url: '/api/ajaxSearch3.aspx',
+                data: {token: 'gswapi', valuekey: e.detail.value},
+                method: "POST",
+                header: {
+                'content-type': 'application/x-www-form-urlencoded'
+                },
+                success: (res) => {
+                    that.searchResult = res.data
+                },
+                fail: (error) => {
+
+                },
+                complete: () => {
+                    that.$apply()
+                }
+            })
+        }
     }
 
     onLoad() {
-        this.requestHotSearchKeys()
+
     }
-
-    requestHotSearchKeys () {
-        wepy.showNavigationBarLoading()
-        var that = this
-        // 1. 获取数据库引用
-        const db = wx.cloud.database()
-        // 2. 构造查询语句
-        // collection 方法获取一个集合的引用
-        // where 方法传入一个对象，数据库返回集合中字段等于指定值的 JSON 文档。API 也支持高级的查询条件（比如大于、小于、in 等），具体见文档查看支持列表
-        // get 方法会触发网络请求，往数据库取数据
-        // hostsearch
-        // search_conditions
-        db.collection('hostsearch').where({
-
-        }).get({
-            success: function (res) {
-                // 输出 [{ "title": "The Catcher in the Rye", ... }]
-                that.hotSearchKeys = res.data[0].hotsearch
-                that.$apply()
-            },
-            fail: function (error) {
-
-            },
-            complete: function () {
-                wepy.hideNavigationBarLoading()
-                wepy.vibrateShort()
-                console.log(that.hotSearchKeys)
-            }
-        })
-  }
 }
 </script>
 
@@ -85,13 +128,32 @@ export default class SearchMore extends wepy.page{
     icon {
     margin-left: 20px;
     }
-
-    .hot_items {
-        display: flex;
-        display: -webkit-flex;
-        justify-content: flex-start;
-    }
 }
 
+.search_result_container {
+    .section_title {
+        font-weight: bold;
+        padding: 10rpx 0 10rpx 40rpx;
+        background-color: gainsboro;
+    }
+
+    .result_cell {
+        border-bottom: 0.5px solid gainsboro;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-left: 40rpx;
+        margin-right: 40rpx;
+        font-size: 14px;
+        .poem_autor {
+            display: inline;
+            color: gray;
+            margin-left: 20px;
+        }
+
+        .poem_sen {
+            display: inline;
+        }
+    }
+}
 
 </style>

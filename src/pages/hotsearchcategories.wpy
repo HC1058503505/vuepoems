@@ -1,0 +1,14 @@
+<template lang="wxml">
+    <view>HotSearchCategories</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class HotSearchCategories extends wepy.page{
+    
+}
+</script>
+
+<style lang="less" scoped>
+
+</style>
