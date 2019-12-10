@@ -1,0 +1,98 @@
+<template lang="wxml">
+    <view class="scroll_container">
+        <scroll-view  class="author_sections" scroll-y scroll-with-animation scroll-into-view="{{sectionId}}">
+            <repeat for="{{searchConditions.author}}" key="index" index="index" item="authoritem">
+                <view class="author_keys_container" id="{{authoritem.title}}">
+                    <view class="author_section_title">{{authoritem.title}}</view>
+                    <repeat for="{{authoritem.list}}" key="index" index="index" item="item">
+                        <view class="author_section_cell" @tap="cell_didselected({{item}})">
+                            <view >{{item.poet_name}}</view>
+                            <view >{{item.poetry_count}}首</view>
+                        </view>
+                    </repeat>
+                </view>
+            </repeat>
+        </scroll-view>
+    </view>
+
+    <view class="keys_index">
+        <repeat for="{{searchConditions.author}}" key="index" index="index" item="authoritem">
+            <view class="author_section_title" @tap="tapZiMu({{authoritem.title}})">{{authoritem.title}}</view>
+        </repeat>
+    </view>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+export default class AuthorHotKeys extends wepy.component {
+    props = {
+        searchConditions: Object
+    }
+
+    methods = {
+        cell_didselected (item) {
+            wepy.navigateTo({ url: '/pages/tagpoems?type=poetry' + '&tagstr=' + item.poet_name });
+        }
+    }
+}
+</script>
+
+
+<style lang="less" scoped>
+.author_container {
+    display: -webkit-flex;
+    display: flex;
+    justify-content: space-between;
+    justify-items: center;
+
+    .scroll_container {
+        display: flex;
+        height: calc(100vh - 100rpx);
+        width: 100vw;
+        .author_sections {
+            flex-grow: 3;
+            display: inline;
+            margin-right: 20px;
+            .author_section_title {
+                background-color: whitesmoke;
+                font-weight: bold;
+                padding-bottom: 5px;
+                padding-top: 5px;
+                padding-left: 10px;
+            }
+            .author_section_cell {
+                display: flex;
+                display: -webkit-flex;
+                justify-content: space-between;
+                border-bottom: 1px solid whitesmoke;
+                padding: 10px;
+                view {
+                    display: inline;
+                }
+            }
+        }
+    }
+    
+
+    .keys_index {
+        padding-right: 4px;
+        position: fixed;
+        top: 50%;
+        right: 0;
+        display: inline;
+        transform: translate(0, -50%);
+        view {
+            text-align: center;
+        }
+    }
+
+
+    ::-webkit-scrollbar{
+        width: 0;
+        height: 0;
+        color: transparent;
+        display: none;
+    }
+}
+</style>

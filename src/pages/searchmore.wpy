@@ -61,7 +61,8 @@ export default class SearchMore extends wepy.page{
         tapSearchResultItem (type, key, value) {
             console.log(type, key, value)
             if (type === 'authorInfo') {
-
+                wepy.navigateTo({ url: '/pages/authorinfo?idnew=' + key + '&nameStr=' + value });
+                
             } else if (type === 'gushiwen') {
                 wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + key + '&nameStr=' + value });
             } else if (type === 'mingju') {

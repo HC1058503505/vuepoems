@@ -72,6 +72,13 @@
 					"id": -1,
 					"name": "pages/searchmore",
 					"pathName": "pages/searchmore",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/hotsearchcategories",
+					"pathName": "pages/hotsearchcategories",
 					"scene": null
 				}
 			]

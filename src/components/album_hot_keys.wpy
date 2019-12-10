@@ -1,0 +1,44 @@
+<template lang="wxml">
+    <view class="album_hot_keys_container">
+        <repeat for="{{searchConditions.collections}}" key="index" index="index" item="item">
+            <view class="album_hot_keys_cell" @tap="cell_didselected({{item}})">
+                <view class="album_key">{{item.name}}</view>
+                <view class="album_poem_count">{{item.count}}{{item.count == 10000 ? '+':''}}首</view>
+            </view>
+        </repeat>
+    </view>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+export default class AlbumHotKeys extends wepy.component{
+    props = {
+        searchConditions: Object
+    }
+
+    methods = {
+        cell_didselected (item) {
+            wepy.navigateTo({ url: '/pages/tagpoems?type=poemalbum' + '&tagstr=' + item.name });
+        }
+    }
+}
+</script>
+
+
+<style lang="less" scoped>
+.album_hot_keys_cell {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px whitesmoke solid;
+    .album_key {
+        display: inline;
+    }
+    .album_poem_count {
+        display: inline;
+    }
+
+}
+</style>

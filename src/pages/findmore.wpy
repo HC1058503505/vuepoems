@@ -45,10 +45,8 @@ export default class FindMore extends wepy.page{
     methods ={
         tapHotSearchTag (index) {
             wepy.navigateTo({ url: '/pages/hotsearchcategories?pageindex=' + index });
-            
         },
         tapHotSearchKey (key, sectionIndex) {
-            console.log('/pages/tagpoems?tagstr=' + key +'&type=' + sectionIndex)
             let typeStr = ''
             if (sectionIndex == 0) {
                 typeStr = 'poetry'
@@ -87,7 +85,6 @@ export default class FindMore extends wepy.page{
             success: function (res) {
                 // 输出 [{ "title": "The Catcher in the Rye", ... }]
                 that.hotSearchKeys = res.data[0].hotsearch
-                console.log(res)
             },
             fail: function (error) {
 

@@ -1,0 +1,61 @@
+<template lang="wxml">
+    <view class="tag_hot_keys_container">
+        <repeat for="{{searchConditions.tag}}" key="index" index="index" item="item">
+            <view class="tag_section_title">{{item.section_title}}</view>
+            <view class="tag_section_cell">
+                <repeat for="{{item.items}}" key="index" index="index" item="tag">
+                    <repeat for="{{tag}}" key="index" index="index" item="tagitem">
+                        <view class="tag_item" @tap="cell_didselected({{tagitem}})">{{tagitem}}</view>
+                    </repeat>
+                </repeat>
+            </view>
+        </repeat>
+    </view>
+</template>
+
+
+<script>
+import wepy from 'wepy'
+export default class TagHotKeys extends wepy.component{
+    props = {
+        searchConditions: Object
+    }
+
+    methods = {
+        cell_didselected (tagitem) {
+            wepy.navigateTo({ url: '/pages/tagpoems?type=tag' + '&tagstr=' + tagitem });
+        }
+    }
+}
+</script>
+
+
+<style lang="less" scoped>
+.tag_hot_keys_container {
+    padding: 10px;
+    .tag_section_title {
+        font-weight: bold;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding-left: 10px;
+        margin-left: 5px;
+        color: orange;
+        border-left: 4px solid orange;
+    }
+    .tag_section_cell {
+        display: flex;
+        display: -webkit-flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        justify-items: flex-start;
+        .tag_item {
+            display: inline;
+            border: 1px lightgray solid;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 5px;
+        }
+    }
+}
+</style>

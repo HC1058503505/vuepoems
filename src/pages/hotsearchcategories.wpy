@@ -1,14 +1,144 @@
 <template lang="wxml">
-    <view>HotSearchCategories</view>
+    <view class="top_tab_container">
+        <view class="top_tab">
+            <view :class="{ 'author_tab': selectedIndex == 0 }" @tap="selectedBarItem(0)">诗人</view>
+            <view :class="{ 'dynasty_tab': selectedIndex == 1 }" @tap="selectedBarItem(1)">朝代</view>
+            <view :class="{ 'tags_tab': selectedIndex == 2 }" @tap="selectedBarItem(2)">标签</view>
+            <view :class="{ 'alubm_tab': selectedIndex == 3 }" @tap="selectedBarItem(3)">诗集</view>
+            <icon class="search_icon" type="search" size="24" @tap="search_action"></icon>
+        </view>
+    </view>
+    <view wx:if="{{selectedIndex == 0}}" class="author_container">
+        <authorHotKeysCom :searchConditions.sync="searchConditions"></authorHotKeysCom>
+    </view>
+    <view wx:elif="{{selectedIndex == 1}}" class="dynasty_container">
+        <dynastyHotKyesCom :searchConditions.sync="searchConditions"></dynastyHotKyesCom>
+    </view>
+    <view wx:elif="{{selectedIndex == 2}}" class="tags_container">
+        <tagHotKeysCom :searchConditions.sync="searchConditions"></tagHotKeysCom>
+    </view>
+    <view wx:else="{{selectedIndex == 3}}" class="album_container">
+        <albumHotKeysCom :searchConditions.sync="searchConditions"></albumHotKeysCom>
+    </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+import AuthorHotKeysCom from '../components/author_hot_keys'
+import DynastyHotKeysCom from '../components/dynasty_hot_keys'
+import AlbumHotKeysCom from '../components/album_hot_keys'
+import TagHotKeysCom from '../components/tag_hot_keys'
 export default class HotSearchCategories extends wepy.page{
-    
+
+    components = {
+        authorHotKeysCom: AuthorHotKeysCom,
+        dynastyHotKyesCom: DynastyHotKeysCom,
+        albumHotKeysCom: AlbumHotKeysCom,
+        tagHotKeysCom: TagHotKeysCom
+    }
+
+    data = {
+        selectedIndex: 0,
+        searchConditions: Object,
+        sectionId: ''
+    }
+
+
+    methods = {
+        tapZiMu (zimu) {
+            this.sectionId = zimu
+            wepy.showToast({
+              title: zimu, //提示的内容,
+              icon: 'none', //图标,
+              duration: 500, //延迟时间,
+              mask: true, //显示透明蒙层，防止触摸穿透,
+              success: res => {
+                  wepy.vibrateShort()
+              }
+            });
+            
+        },
+        search_action () {
+            wepy.navigateTo({ url: '/pages/searchmore' });
+        },
+        selectedBarItem (index) {
+            console.log(index)
+            this.selectedIndex = index
+        }
+    }
+
+    onLoad (params) {
+        this.selectedIndex = params.pageindex
+        this.requestSearchHotKeys()
+    }
+
+    requestSearchHotKeys () {
+        wepy.showNavigationBarLoading()
+        var that = this
+        // 1. 获取数据库引用
+        const db = wx.cloud.database()
+        // 2. 构造查询语句
+        // collection 方法获取一个集合的引用
+        // where 方法传入一个对象，数据库返回集合中字段等于指定值的 JSON 文档。API 也支持高级的查询条件（比如大于、小于、in 等），具体见文档查看支持列表
+        // get 方法会触发网络请求，往数据库取数据
+        db.collection('search_conditions').where({
+
+        }).get({
+            success: function (res) {
+                // 输出 [{ "title": "The Catcher in the Rye", ... }]
+                console.log(res.data[0])
+                that.searchConditions = res.data[0]
+                that.$apply()
+            },
+            fail: function (error) {
+
+            },
+            complete: function () {
+                wepy.hideNavigationBarLoading()
+                wepy.vibrateShort()
+            }
+        })
+    }
 }
 </script>
 
 <style lang="less" scoped>
-
+.top_tab_container {
+    .top_tab {
+        padding: 10px;
+        display: flex;
+        display: -webkit-flex;
+        justify-content: space-around;
+        justify-items: center;
+    
+        view, icon {
+            display: inline;
+            color: grey;
+        }
+    
+        .author_tab {
+            color: red;
+            border-bottom: 2px solid red;
+        }
+    
+        .dynasty_tab {
+            color: blueviolet;
+            border-bottom: 2px solid blueviolet;
+        }
+    
+        .tags_tab {
+            color: orange;
+            border-bottom: 2px solid orange;
+        }
+    
+        .alubm_tab {
+            color: cyan;
+            border-bottom: 2px solid cyan;
+        }
+    
+        .search_icon {
+    
+        }
+    }
+}
 </style>

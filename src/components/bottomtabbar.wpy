@@ -49,7 +49,6 @@ export default class BottomTabBar extends wepy.component{
         selectedBarItem: (index) => {
             this.selectedIndex = index
             this.$emit('selectedBarItem', index)
-            console.log('emit: $index')
         }
     }
 }
