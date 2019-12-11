@@ -1,20 +1,117 @@
-<template>
-    <view>收藏</view>
+<template lang="wxml">
+    <view class="collections_container">
+        <repeat for="{{collections}}" key="index" index="index" item="collection">
+            <view class="collection_section" @tap="showPoemDetail({{collection}})">
+                <view class="collection_title_container">
+                    <view class="collection_name">{{collection.poetry_name}}</view>
+                    <view class="collection_dynasty_author">{{collection.poetry_dynasty}}/{{collection.poetry_author}}</view>
+                </view>
+                <view class="collection_content">{{collection.poetry_content}}</view>
+            </view>
+        </repeat>
+    </view>
 </template>
 
 <script>
 import wepy from 'wepy'
 export default class CollectionHistory extends wepy.page {
-    onLoad (params) {
-        if (params.type == 0) {
-            wepy.setNavigationBarTitle({ title: '我的收藏' });
-        } else if (params.type == 1) {
-            wepy.setNavigationBarTitle({ title: '浏览记录' });
+
+    data = {
+        collections: [],
+        pageNum: 0
+    }
+
+    methods = {
+        showPoemDetail (poem) {
+            wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + poem.poetry_id + '&nameStr=' + poem.poetry_name})
         }
+    }
+
+    onLoad (params) {
+        let navBarTitle = ''
+        let collection_name = ''
+        if (params.type === 'mine_collection') {
+            navBarTitle = '我的收藏'
+            collection_name = 'poetry_collections'
+        } else if (params.type === 'browse_histories') {
+            navBarTitle = '浏览记录'
+            collection_name = 'browse_histories'
+        }
+        wepy.setNavigationBarTitle({ title: navBarTitle });
+        this.requestCollections(collection_name)
+    }
+
+    requestCollections(collection_name) {
+        
+        if (!wepy.$instance.globalData.userInfo) {
+            return
+        }
+
+        wepy.showNavigationBarLoading()
+        var that = this
+        // 1. 获取数据库引用
+        const db = wx.cloud.database()
+        // 2. 构造查询语句
+        // collection 方法获取一个集合的引用
+        // where 方法传入一个对象，数据库返回集合中字段等于指定值的 JSON 文档。API 也支持高级的查询条件（比如大于、小于、in 等），具体见文档查看支持列表
+        // get 方法会触发网络请求，往数据库取数据
+        db.collection(collection_name).orderBy('poetry_collection_date', 'desc').where({
+          usersignature: wepy.$instance.globalData.userInfo.singature
+        }).skip(that.pageNum * 10).limit(10).get({
+          success: function(res) {
+            // 输出 [{ "title": "The Catcher in the Rye", ... }]
+            let gushiwens = res.data
+            gushiwens.forEach(element => {
+                element.poetry_content = element.poetry_content.trim().split('\n')[0]
+            });
+            
+            that.pageNum ++
+            that.collections = that.collections.concat(gushiwens)
+          },
+          fail: function(error) {
+
+          },
+          complete: function() {
+            wepy.hideNavigationBarLoading()
+            // 短暂震动
+            wepy.vibrateShort()
+            that.$apply()
+          }
+        })
+
     }
 }
 </script>
 
 <style lang="less" scoped>
+.collections_container {
+    padding-left: 10px;
+    padding-right: 10px;
+    .collection_section {
+        border-bottom: 1px solid gainsboro;
+        padding-bottom: 8px;
+        padding-top: 8px;
+        .collection_title_container {
+            font-size: 14px;
+            display: flex;
+            display: -webkit-flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            .collection_name {
+                margin-right: 20px;
+                padding-bottom: 5px;
+            }
+    
+            .collection_dynasty_author {
+                color: gray;
+                width: 120px;
+                padding-bottom: 5px;
+            }
+        }
 
+        .collection_content {
+            padding-top: 5px;
+        }
+    }
+}
 </style>

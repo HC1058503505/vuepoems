@@ -55,6 +55,8 @@ export default class PoemCont extends wepy.component {
             let tb_gushiwen = newValue.tb_gushiwen
             let poemContNodes = WXParse.wxParse('poemCont', 'html', tb_gushiwen.cont, this).poemCont
             this.poemSlices(poemContNodes)
+            // 添加浏览记录
+            this.addBrowseHistories(newValue)
         }   
     }
 
@@ -367,7 +369,7 @@ export default class PoemCont extends wepy.component {
         const db = wx.cloud.database()
         db.collection("poetry_collections").where({
             poetry_id: that.poemData.tb_gushiwen.idnew,
-            usersinature: wepy.$instance.globalData.userInfo.signature
+            usersignature: wepy.$instance.globalData.userInfo.signature
         }).get({
             success: function(res) {
                 that.isCollection = res.data.length > 0
@@ -411,7 +413,7 @@ export default class PoemCont extends wepy.component {
                 poetry_author: gushiwen.author,
                 poetry_collection_date: Date.parse(Date()),
                 poetry_search_type: '',
-                usersinature: wepy.$instance.globalData.userInfo.signature
+                usersignature: wepy.$instance.globalData.userInfo.signature
             },
             success: function(res) {
                 that.isCollection = true
@@ -466,6 +468,55 @@ export default class PoemCont extends wepy.component {
             }
         })
     }
+
+    addBrowseHistories (poemData) {
+        if (!wepy.$instance.globalData.userInfo.signature) {
+            return
+        }
+        console.log(poemData, wepy.$instance.globalData.userInfo.signature)
+
+        let poem_id = poemData.tb_gushiwen.idnew
+        var that = this
+        let gushiwen = poemData.tb_gushiwen
+
+        // 1. 获取数据库引用
+        const db = wx.cloud.database()
+        // 先删除之前的记录
+        db.collection("browse_histories").where({
+            poetry_id: poem_id,
+            usersignature: wepy.$instance.globalData.userInfo.signature
+        }).get({
+            success: function(res) {
+                if (res.data.length > 0) {
+                    // 更新
+                    db.collection('browse_histories').update({
+                        data: {
+                            poetry_collection_date: Date.parse(Date())
+                        }
+                    })
+                } else {
+                    // 添加
+                    db.collection('browse_histories').add({
+                        data: {
+                            poetry_id: poem_id,
+                            poetry_name: gushiwen.nameStr,
+                            poetry_dynasty: gushiwen.chaodai,
+                            poetry_content: that.poemStr,
+                            poetry_author: gushiwen.author,
+                            poetry_collection_date: Date.parse(Date()),
+                            poetry_search_type: '',
+                            usersignature: wepy.$instance.globalData.userInfo.signature
+                        }
+                    })
+                }
+            },
+            fail: function(error) {
+            },
+            complete: function(res) {
+            }
+        })
+    }
+
     getOpenId () {
         let that = this
         wepy.getSetting({ success: res => {

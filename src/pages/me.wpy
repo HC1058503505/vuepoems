@@ -10,13 +10,13 @@
     </view>
 
     <view class="section_list_container">
-        <view class="section_cell" @tap="showMore(0)">
+        <view class="section_cell" @tap="showMore('mine_collection')">
             <image class="section_icon" src="../images/yes_collection.png" mode="aspectFill"
               lazy-load="false">
             </image>
             <view class="section_title">我的收藏</view>
         </view>
-        <view class="section_cell" @tap="showMore(1)">
+        <view class="section_cell" @tap="showMore('browse_histories')">
             <image class="section_icon" src="../images/liulanjilu.png" mode="aspectFill"
               lazy-load="false">
             </image>
@@ -40,9 +40,8 @@ export default class Me extends wepy.page{
     }
 
     methods = {
-        showMore(index) {
-            wepy.navigateTo({ url: '/pages/collectionhistory?type=', index });
-            
+        showMore(typeStr) {
+            wepy.navigateTo({ url: '/pages/collectionhistory?type=' + typeStr });
         },
 
         tapLogin (res) {
@@ -59,12 +58,10 @@ export default class Me extends wepy.page{
 
     }
     onLoad () {
-
         if (wepy.$instance.globalData.userInfo) {
             this.hideLogBtn = false
             this.avatar = wepy.$instance.globalData.userInfo.userInfo.avatarUrl
         } else {
-            console.log('has no userInfo')
             this.hideLogBtn = true
         }
     }
