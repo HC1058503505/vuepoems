@@ -3,7 +3,7 @@
         <view class="poem_cont_container" >
                 <view class="poem_cont_tools">
                     
-                    <button class="action_btn" @tap="collectionAction" open-type="getUserInfo">
+                    <button class="action_btn" @tap="collectionAction" open-type="getUserInfo" bindgetuserinfo="{{wepy.$intance.globalData.userInfo == null ? '' : 'getUserInfoAction'}}">
                         <image class="action_img" src="{{isCollection ? '../images/yes_collection.png' : '../images/no_collection.png'}}"  /> 
                     </button>
 
@@ -61,37 +61,19 @@ export default class PoemCont extends wepy.component {
     }
 
     methods = {
-        collectionAction () {
-            let that = this
-            if (wepy.$instance.globalData.userInfo) {
-                if (wepy.$instance.globalData.openid === '') {
-                    wepy.$instance.getOpenId(() => {
-                        // 获取了openid
-                        that.judgeCollection()
-                    })
-                } else {
-                    that.collectionOrCancle()
-                }
+        getUserInfoAction (res) {
+            if (!res.detail.userInfo || !res.detail.signature) {
+                // 拒绝
                 return
-            } 
+            }
 
-            wepy.getUserInfo({
-              withCredentials: true,
-              success: res => {
-                wepy.$instance.globalData.userInfo = res.userInfo
-                if (wepy.$instance.globalData.openid === '') {
-                    wepy.$instance.getOpenId(() => {
-                        // 判断是否已收藏
-                        that.judgeCollection()
-                    })
-                }
-              },
-              fail: () => {
-              },   
-              complete: () => {
+            // 同意
+            wepy.$instance.globalData.userInfo = res.detail
+            this.judgeCollection()
+        },
 
-              }
-            });
+        collectionAction () {
+            this.collectionOrCancle()
         },
         moreAction () {
             if (this.canvasH == 0) {
@@ -336,19 +318,19 @@ export default class PoemCont extends wepy.component {
         var canvasWidth = this.width;
         var lastSubStrIndex = 0;
         for (let i = 0; i < str.length; i++) {
-        lineWidth += ctx.measureText(str[i]).width;
-        if (lineWidth > canvasWidth - 40) { //减去initX,防止边界出现的问题
-            if (isFillText) {
-                ctx.fillText(str.substring(lastSubStrIndex, i), initX, initY);
-            }
+            lineWidth += ctx.measureText(str[i]).width;
+            if (lineWidth > canvasWidth - 40) { //减去initX,防止边界出现的问题
+                if (isFillText) {
+                    ctx.fillText(str.substring(lastSubStrIndex, i), initX, initY);
+                }
 
-            initY += lineHeight;
-            lineWidth = 0;
-            lastSubStrIndex = i;
-        }
-        if (i == str.length - 1 && isFillText) {
-            ctx.fillText(str.substring(lastSubStrIndex, i + 1), initX, initY);
-        }
+                initY += lineHeight;
+                lineWidth = 0;
+                lastSubStrIndex = i;
+            }
+            if (i == str.length - 1 && isFillText) {
+                ctx.fillText(str.substring(lastSubStrIndex, i + 1), initX, initY);
+            }
         }
 
         return initY + lineHeight
@@ -470,10 +452,9 @@ export default class PoemCont extends wepy.component {
     }
 
     addBrowseHistories (poemData) {
-        if (!wepy.$instance.globalData.userInfo.signature) {
+        if (!wepy.$instance.globalData.userInfo) {
             return
         }
-        console.log(poemData, wepy.$instance.globalData.userInfo.signature)
 
         let poem_id = poemData.tb_gushiwen.idnew
         var that = this

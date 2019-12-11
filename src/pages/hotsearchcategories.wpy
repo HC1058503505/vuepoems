@@ -49,7 +49,6 @@ export default class HotSearchCategories extends wepy.page{
             wepy.navigateTo({ url: '/pages/searchmore' });
         },
         selectedBarItem (index) {
-            console.log(index)
             this.selectedIndex = index
         }
     }
@@ -73,7 +72,6 @@ export default class HotSearchCategories extends wepy.page{
         }).get({
             success: function (res) {
                 // 输出 [{ "title": "The Catcher in the Rye", ... }]
-                console.log(res.data[0])
                 that.searchConditions = res.data[0]
                 that.$apply()
             },

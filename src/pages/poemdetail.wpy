@@ -95,7 +95,7 @@ export default class PoemDetail extends wepy.page {
                 that.$apply()
             },
             fail: (error) => {
-                console.log(error)
+
             },
             complete: () => {
                 wepy.hideNavigationBarLoading();
