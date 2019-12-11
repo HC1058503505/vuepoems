@@ -27,10 +27,27 @@
 import wepy from 'wepy'
 export default class AuthorHotKeys extends wepy.component {
     props = {
-        searchConditions: Object
+        searchConditions: Object,
+    }
+
+    data = {
+        sectionId: ''
     }
 
     methods = {
+        tapZiMu (zimu) {
+            this.sectionId = zimu
+            wepy.showToast({
+              title: zimu, //提示的内容,
+              icon: 'none', //图标,
+              duration: 500, //延迟时间,
+              mask: true, //显示透明蒙层，防止触摸穿透,
+              success: res => {
+                  wepy.vibrateShort()
+              }
+            });
+            
+        },
         cell_didselected (item) {
             wepy.navigateTo({ url: '/pages/tagpoems?type=poetry' + '&tagstr=' + item.poet_name });
         }
@@ -48,7 +65,7 @@ export default class AuthorHotKeys extends wepy.component {
 
     .scroll_container {
         display: flex;
-        height: calc(100vh - 100rpx);
+        height: calc(100vh - 44px);
         width: 100vw;
         .author_sections {
             flex-grow: 3;

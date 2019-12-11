@@ -3,6 +3,7 @@
 	"setting": {
 		"urlCheck": true,
 		"es6": false,
+		"enhance": false,
 		"postcss": false,
 		"minified": false,
 		"newFeature": true,
@@ -15,15 +16,15 @@
 			"ignore": [],
 			"disablePlugins": [],
 			"outputPath": ""
-		},
-		"enhance": false
+		}
 	},
 	"compileType": "miniprogram",
-	"appid": "wxe57c9eee18f3a179",
+	"appid": "wx72dd13ddd430a8b6",
 	"projectname": "vuepoems",
 	"miniprogramRoot": "dist/",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
+	"cloudfunctionTemplateRoot": "cloudfunctionTemplate",
 	"condition": {
 		"search": {
 			"current": -1,
@@ -79,6 +80,13 @@
 					"id": -1,
 					"name": "pages/hotsearchcategories",
 					"pathName": "pages/hotsearchcategories",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/me",
+					"pathName": "pages/me",
 					"scene": null
 				}
 			]

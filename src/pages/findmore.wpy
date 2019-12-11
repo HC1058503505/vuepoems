@@ -8,28 +8,31 @@
         </input>
     </view>
 
-    <view wx-if="{{requestHotKeysFinished}}">
-        <view class="hot_search_title">热搜标签</view>
-        <view class="hot_search_container">
-            <view class="poem_author" @tap="tapHotSearchTag(0)">诗人</view>
-            <view class="dynasty" @tap="tapHotSearchTag(1)">朝代</view>
-            <view class="tags" @tap="tapHotSearchTag(2)">标签</view>
-            <view class="poem_album" @tap="tapHotSearchTag(3)">诗集</view>
-        </view>
-    </view>
-    
-    <view class="more_hot_keys">
-        <repeat for="{{hotSearchKeys}}" key="index" index="sectionIndex" item="item">
-            <view class="hot_search_title {{'more_hot_keys_' + sectionIndex}}">{{item.title}}</view>
-            <view class="hot_items">
-                <repeat for="{{item.hotkeys}}" key="index" index="index" item="hotkey">
-                    <repeat for="{{hotkey}}" key="index" index="index" item="hotkeyitem">
-                        <view class="key_item" @tap="tapHotSearchKey({{hotkeyitem.name}}, {{sectionIndex}})">{{hotkeyitem.name}}</view>
-                    </repeat>
-                </repeat>
+    <scroll-view scroll-y scroll-with-animation>
+        <view wx-if="{{requestHotKeysFinished}}">
+            <view class="hot_search_title">热搜标签</view>
+            <view class="hot_search_container">
+                <view class="poem_author" @tap="tapHotSearchTag(0)">诗人</view>
+                <view class="dynasty" @tap="tapHotSearchTag(1)">朝代</view>
+                <view class="tags" @tap="tapHotSearchTag(2)">标签</view>
+                <view class="poem_album" @tap="tapHotSearchTag(3)">诗集</view>
             </view>
-        </repeat>
-    </view>
+        </view>
+        
+        <view class="more_hot_keys">
+            <repeat for="{{hotSearchKeys}}" key="index" index="sectionIndex" item="item">
+                <view class="hot_search_title {{'more_hot_keys_' + sectionIndex}}">{{item.title}}</view>
+                <view class="hot_items">
+                    <repeat for="{{item.hotkeys}}" key="index" index="index" item="hotkey">
+                        <repeat for="{{hotkey}}" key="index" index="index" item="hotkeyitem">
+                            <view class="key_item" @tap="tapHotSearchKey({{hotkeyitem.name}}, {{sectionIndex}})">{{hotkeyitem.name}}</view>
+                        </repeat>
+                    </repeat>
+                </view>
+            </repeat>
+        </view>
+    </scroll-view>
+
 </template>
 
 
@@ -37,6 +40,10 @@
 import wepy from 'wepy'
 import Request from '../request/request.js'
 export default class FindMore extends wepy.page{
+    config = {
+      navigationBarTitleText: '发现'
+    }
+
     data = {
         hotSearchKeys: [Object],
         requestHotKeysFinished: false
@@ -84,6 +91,7 @@ export default class FindMore extends wepy.page{
         }).get({
             success: function (res) {
                 // 输出 [{ "title": "The Catcher in the Rye", ... }]
+                wepy.hideNavigationBarLoading();
                 that.hotSearchKeys = res.data[0].hotsearch
             },
             fail: function (error) {
@@ -101,6 +109,19 @@ export default class FindMore extends wepy.page{
 </script>
 
 <style lang="less" scoped>
+scroll-view {
+    display: fixed;
+    height: calc(100vh - 120rpx - 20px);
+    width: 100vw;
+}
+
+::-webkit-scrollbar{
+    width: 0;
+    height: 0;
+    color: transparent;
+    display: none;
+}
+
 input {
     margin-left: 20rpx;
     font-size: large;

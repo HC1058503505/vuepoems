@@ -45,19 +45,6 @@ export default class HotSearchCategories extends wepy.page{
 
 
     methods = {
-        tapZiMu (zimu) {
-            this.sectionId = zimu
-            wepy.showToast({
-              title: zimu, //提示的内容,
-              icon: 'none', //图标,
-              duration: 500, //延迟时间,
-              mask: true, //显示透明蒙层，防止触摸穿透,
-              success: res => {
-                  wepy.vibrateShort()
-              }
-            });
-            
-        },
         search_action () {
             wepy.navigateTo({ url: '/pages/searchmore' });
         },

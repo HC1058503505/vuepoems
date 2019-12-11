@@ -1,12 +1,14 @@
 <template lang="wxml">
-    <view class="album_hot_keys_container">
-        <repeat for="{{searchConditions.collections}}" key="index" index="index" item="item">
-            <view class="album_hot_keys_cell" @tap="cell_didselected({{item}})">
-                <view class="album_key">{{item.name}}</view>
-                <view class="album_poem_count">{{item.count}}{{item.count == 10000 ? '+':''}}首</view>
-            </view>
-        </repeat>
-    </view>
+    <scroll-view scroll-y scroll-with-animation>
+        <view class="album_hot_keys_container">
+            <repeat for="{{searchConditions.collections}}" key="index" index="index" item="item">
+                <view class="album_hot_keys_cell" @tap="cell_didselected({{item}})">
+                    <view class="album_key">{{item.name}}</view>
+                    <view class="album_poem_count">{{item.count}}{{item.count == 10000 ? '+':''}}首</view>
+                </view>
+            </repeat>
+        </view>
+    </scroll-view>
 </template>
 
 
@@ -27,6 +29,12 @@ export default class AlbumHotKeys extends wepy.component{
 
 
 <style lang="less" scoped>
+scroll-view {
+    display: fixed;
+    height: calc(100vh - 44px);
+    width: 100vw;
+}
+
 .album_hot_keys_cell {
     display: flex;
     display: -webkit-flex;

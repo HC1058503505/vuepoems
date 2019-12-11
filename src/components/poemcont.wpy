@@ -353,16 +353,21 @@ export default class PoemCont extends wepy.component {
     }
 
     judgeCollection () {
-        var that = this
-        if (!that.poemData) {
+        
+        if (!this.poemData) {
             return
         }
 
+        if (!wepy.$instance.globalData.userInfo) {
+            return
+        }
+
+        var that = this
         // 1. 获取数据库引用
         const db = wx.cloud.database()
         db.collection("poetry_collections").where({
-            _openid: wepy.$instance.globalData.openid,
-            poetry_id: that.poemData.tb_gushiwen.idnew
+            poetry_id: that.poemData.tb_gushiwen.idnew,
+            usersinature: wepy.$instance.globalData.userInfo.signature
         }).get({
             success: function(res) {
                 that.isCollection = res.data.length > 0
@@ -388,7 +393,6 @@ export default class PoemCont extends wepy.component {
     }
     addCollection () {
         let poem_id = this.poemData.tb_gushiwen.idnew
-        let categorysearch = wx.getStorageSync("categorysearch")
         var that = this
         let gushiwen = this.poemData.tb_gushiwen
 
@@ -406,7 +410,8 @@ export default class PoemCont extends wepy.component {
                 poetry_content: that.poemStr,
                 poetry_author: gushiwen.author,
                 poetry_collection_date: Date.parse(Date()),
-                poetry_search_type: categorysearch
+                poetry_search_type: '',
+                usersinature: wepy.$instance.globalData.userInfo.signature
             },
             success: function(res) {
                 that.isCollection = true

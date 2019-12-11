@@ -1,0 +1,20 @@
+<template>
+    <view>收藏</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class CollectionHistory extends wepy.page {
+    onLoad (params) {
+        if (params.type == 0) {
+            wepy.setNavigationBarTitle({ title: '我的收藏' });
+        } else if (params.type == 1) {
+            wepy.setNavigationBarTitle({ title: '浏览记录' });
+        }
+    }
+}
+</script>
+
+<style lang="less" scoped>
+
+</style>

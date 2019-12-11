@@ -29,7 +29,8 @@ export default class extends wepy.app {
       'pages/tagpoems',
       'pages/searchmore',
       'pages/hotsearchcategories',
-      'pages/authorinfo'
+      'pages/authorinfo',
+      'pages/collectionhistory'
     ],
     tabBar: {
       color: '#8A8A8A',
@@ -61,7 +62,7 @@ export default class extends wepy.app {
       navigationBarTitleText: '小诗词',
       navigationBarTextStyle: 'black'
     },
-    // sitemapLocation: 'sitemap.json'
+    sitemapLocation: 'sitemap.json'
   }
 
   globalData = {
@@ -83,6 +84,7 @@ export default class extends wepy.app {
               wx.cloud.callFunction({
                   name: 'getUserId',
                   complete: res => {
+                    console.log(res)
                     that.globalData.openid = res.result.openid
                     callback && callback()
                   }
@@ -95,7 +97,7 @@ export default class extends wepy.app {
     this.testAsync()
     wx.cloud.init({
       env: {
-        database:"wepoems-2f5265"
+        database:"vuepoems-mcch3"
       },
       traceUser: true
     })
@@ -121,12 +123,14 @@ export default class extends wepy.app {
 
   getUserInfo(cb) {
     const that = this
+
     if (this.globalData.userInfo) {
       return this.globalData.userInfo
     }
     wepy.getUserInfo({
       success (res) {
-        that.globalData.userInfo = res.userInfo
+        console.log(res)
+        that.globalData.userInfo = res
         cb && cb(res.userInfo)
       }
     })

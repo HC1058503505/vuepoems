@@ -1,16 +1,18 @@
 <template lang="wxml">
-    <view class="tag_hot_keys_container">
-        <repeat for="{{searchConditions.tag}}" key="index" index="index" item="item">
-            <view class="tag_section_title">{{item.section_title}}</view>
-            <view class="tag_section_cell">
-                <repeat for="{{item.items}}" key="index" index="index" item="tag">
-                    <repeat for="{{tag}}" key="index" index="index" item="tagitem">
-                        <view class="tag_item" @tap="cell_didselected({{tagitem}})">{{tagitem}}</view>
+    <scroll-view scroll-y scroll-with-animation>
+        <view class="tag_hot_keys_container">
+            <repeat for="{{searchConditions.tag}}" key="index" index="index" item="item">
+                <view class="tag_section_title">{{item.section_title}}</view>
+                <view class="tag_section_cell">
+                    <repeat for="{{item.items}}" key="index" index="index" item="tag">
+                        <repeat for="{{tag}}" key="index" index="index" item="tagitem">
+                            <view class="tag_item" @tap="cell_didselected({{tagitem}})">{{tagitem}}</view>
+                        </repeat>
                     </repeat>
-                </repeat>
-            </view>
-        </repeat>
-    </view>
+                </view>
+            </repeat>
+        </view>
+    </scroll-view>
 </template>
 
 
@@ -31,6 +33,12 @@ export default class TagHotKeys extends wepy.component{
 
 
 <style lang="less" scoped>
+scroll-view {
+    display: fixed;
+    height: calc(100vh - 44px);
+    width: 100vw;
+}
+
 .tag_hot_keys_container {
     padding: 10px;
     .tag_section_title {
