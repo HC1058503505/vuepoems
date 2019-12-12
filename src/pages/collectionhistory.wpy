@@ -1,4 +1,5 @@
 <template lang="wxml">
+    
     <view class="collections_container">
         <repeat for="{{collections}}" key="index" index="index" item="collection">
             <view class="collection_section" @tap="showPoemDetail({{collection}})">
@@ -16,15 +17,36 @@
 import wepy from 'wepy'
 export default class CollectionHistory extends wepy.page {
 
+    config = {
+      enablePullDownRefresh: true
+    }
+
     data = {
         collections: [],
-        pageNum: 0
+        pageNum: 0,
+        collection_name: null
     }
 
     methods = {
         showPoemDetail (poem) {
             wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + poem.poetry_id + '&nameStr=' + poem.poetry_name})
+        },
+        reloadAction () {
+            this.requestCollections()
         }
+    }
+
+    onPullDownRefresh() {
+        this.pageNum = 0
+        
+        let that = this
+        this.requestCollections(() => {
+            wepy.stopPullDownRefresh()
+        })
+    }
+
+    onReachBottom () {
+        this.requestCollections()
     }
 
     onLoad (params) {
@@ -37,13 +59,18 @@ export default class CollectionHistory extends wepy.page {
             navBarTitle = '浏览记录'
             collection_name = 'browse_histories'
         }
+        this.collection_name = collection_name
         wepy.setNavigationBarTitle({ title: navBarTitle });
-        this.requestCollections(collection_name)
+        this.requestCollections()
     }
 
-    requestCollections(collection_name) {
+    requestCollections(callback) {
         
         if (wepy.$instance.globalData.openid == null) {
+            return
+        }
+
+        if (this.collection_name == null) {
             return
         }
 
@@ -55,10 +82,25 @@ export default class CollectionHistory extends wepy.page {
         // collection 方法获取一个集合的引用
         // where 方法传入一个对象，数据库返回集合中字段等于指定值的 JSON 文档。API 也支持高级的查询条件（比如大于、小于、in 等），具体见文档查看支持列表
         // get 方法会触发网络请求，往数据库取数据
-        db.collection(collection_name).orderBy('poetry_collection_date', 'desc').where({
+        db.collection(this.collection_name).orderBy('poetry_collection_date', 'desc').where({
           _openid: wepy.$instance.globalData.openid
         }).skip(that.pageNum * 10).limit(10).get({
           success: function(res) {
+            if (res.data.length == 0) {
+                wepy.showToast({
+                  title: '没有更多数据', //提示的内容,
+                  icon: 'none', //图标,
+                  duration: 2000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {}
+                });
+                return
+            }
+
+            if (that.pageNum == 0) {
+                that.collections = []
+            }
+            
             // 输出 [{ "title": "The Catcher in the Rye", ... }]
             let gushiwens = res.data
             gushiwens.forEach(element => {
@@ -69,9 +111,17 @@ export default class CollectionHistory extends wepy.page {
             that.collections = that.collections.concat(gushiwens)
           },
           fail: function(error) {
-
+              wepy.showToast({
+                title: '加载失败', //提示的内容,
+                icon: 'error', //图标,
+                duration: 2000, //延迟时间,
+                mask: true, //显示透明蒙层，防止触摸穿透,
+                success: res => {}
+              });
+              
           },
           complete: function() {
+            callback && callback()
             wepy.hideNavigationBarLoading()
             // 短暂震动
             wepy.vibrateShort()
@@ -87,6 +137,13 @@ export default class CollectionHistory extends wepy.page {
 .collections_container {
     padding-left: 10px;
     padding-right: 10px;
+    align-items: center;
+    .reload {
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        margin-top: 50%;
+    }
     .collection_section {
         border-bottom: 1px solid gainsboro;
         padding-bottom: 8px;

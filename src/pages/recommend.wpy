@@ -85,7 +85,9 @@ export default class Recommend extends wepy.page{
                     that.$apply()
                     return
                 }
-
+                if (that.currentPage == 1) {
+                    that.poems = []
+                }
                 that.poems = that.poems.concat(res.data.gushiwens)
                 that.currentPage = that.currentPage + 1
                 that.sumPage = res.data.sumPage
