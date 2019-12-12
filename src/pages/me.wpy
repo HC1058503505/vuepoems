@@ -5,7 +5,7 @@
         </image>
 
         <button class="login_btn" wx:if="{{hideLogBtn}}" type="info" open-type="getUserInfo" bindgetuserinfo="tapLogin">
-            点击登录
+            {{logBtnTitle}}
         </button>
     </view>
 
@@ -36,11 +36,23 @@ export default class Me extends wepy.page{
 
     data = {
         avatar: '../images/shi.png',
-        hideLogBtn: true
+        hideLogBtn: true,
+        logBtnTitle: '点击登录',
+        loginTimer: null
     }
 
     methods = {
         showMore(typeStr) {
+            if (wepy.$instance.globalData.userInfo == null) {
+                this.logBtnTitle = '请您先登录'
+                let that = this
+                this.loginTimer = setTimeout(() => {
+                    that.logBtnTitle = '点击登录'
+                    that.$apply()
+                }, 2000);
+                
+                return
+            }
             wepy.navigateTo({ url: '/pages/collectionhistory?type=' + typeStr });
         },
 
@@ -57,6 +69,12 @@ export default class Me extends wepy.page{
 
     onShow () {
 
+    }
+
+    onUnload () {
+        if (this.loginTimer) {
+            clearTimeout(this.loginTimer)
+        }
     }
     onLoad () {
         if (wepy.$instance.globalData.userInfo) {
@@ -84,7 +102,7 @@ export default class Me extends wepy.page{
 }
 
 .section_list_container {
-    padding-top: 50px;
+    padding-top: 80px;
     padding-left: 15px;
     padding-right: 15px;
 
