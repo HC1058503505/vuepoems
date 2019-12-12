@@ -3,7 +3,10 @@
         <view class="poem_cont_container" >
                 <view class="poem_cont_tools">
                     
-                    <button class="action_btn" @tap="collectionAction" open-type="getUserInfo" bindgetuserinfo="{{wepy.$intance.globalData.userInfo == null ? '' : 'getUserInfoAction'}}">
+                    <button wx:if="{{agreed}}" class="action_btn" @tap="{{agreed ? 'collectionAction' : ''}}">
+                        <image class="action_img" src="{{isCollection ? '../images/yes_collection.png' : '../images/no_collection.png'}}"  /> 
+                    </button>
+                    <button wx:else class="action_btn" open-type="getUserInfo" bindgetuserinfo="{{agrred ? '' : 'getUserInfoAction'}}">
                         <image class="action_img" src="{{isCollection ? '../images/yes_collection.png' : '../images/no_collection.png'}}"  /> 
                     </button>
 
@@ -41,7 +44,8 @@ export default class PoemCont extends wepy.component {
         canvasHidden: true,
         openid: '',
         previewUrl: '',
-        doc_id: ''
+        doc_id: '',
+        agreed: false
     }
 
     watch = {
@@ -62,19 +66,28 @@ export default class PoemCont extends wepy.component {
 
     methods = {
         getUserInfoAction (res) {
-            if (!res.detail.userInfo || !res.detail.signature) {
+            if (res.detail.userInfo == null) {
                 // 拒绝
                 return
             }
 
             // 同意
+            this.agreed = true
             wepy.$instance.globalData.userInfo = res.detail
-            this.judgeCollection()
+            
+            // 获取openid
+            let that = this
+            wepy.$instance.globalData.getOpenId(() => {
+                that.judgeCollection()
+                that.addBrowseHistories(that.poemData)
+            })
+            
         },
 
         collectionAction () {
             this.collectionOrCancle()
         },
+
         moreAction () {
             if (this.canvasH == 0) {
                 this.canvasH = this.canvasWH().canvasH
@@ -342,7 +355,7 @@ export default class PoemCont extends wepy.component {
             return
         }
 
-        if (!wepy.$instance.globalData.userInfo) {
+        if (wepy.$instance.globalData.openid == null) {
             return
         }
 
@@ -351,7 +364,7 @@ export default class PoemCont extends wepy.component {
         const db = wx.cloud.database()
         db.collection("poetry_collections").where({
             poetry_id: that.poemData.tb_gushiwen.idnew,
-            usersignature: wepy.$instance.globalData.userInfo.signature
+            _openid: wepy.$instance.globalData.openid
         }).get({
             success: function(res) {
                 that.isCollection = res.data.length > 0
@@ -376,6 +389,9 @@ export default class PoemCont extends wepy.component {
         this.addCollection()
     }
     addCollection () {
+        if (wepy.$instance.globalData.userInfo == null) {
+            return
+        }
         let poem_id = this.poemData.tb_gushiwen.idnew
         var that = this
         let gushiwen = this.poemData.tb_gushiwen
@@ -394,8 +410,7 @@ export default class PoemCont extends wepy.component {
                 poetry_content: that.poemStr,
                 poetry_author: gushiwen.author,
                 poetry_collection_date: Date.parse(Date()),
-                poetry_search_type: '',
-                usersignature: wepy.$instance.globalData.userInfo.signature
+                poetry_search_type: ''
             },
             success: function(res) {
                 that.isCollection = true
@@ -452,7 +467,7 @@ export default class PoemCont extends wepy.component {
     }
 
     addBrowseHistories (poemData) {
-        if (!wepy.$instance.globalData.userInfo) {
+        if (!wepy.$instance.globalData.openid) {
             return
         }
 
@@ -465,12 +480,13 @@ export default class PoemCont extends wepy.component {
         // 先删除之前的记录
         db.collection("browse_histories").where({
             poetry_id: poem_id,
-            usersignature: wepy.$instance.globalData.userInfo.signature
+            _openid: wepy.$instance.globalData.openid
         }).get({
             success: function(res) {
                 if (res.data.length > 0) {
                     // 更新
-                    db.collection('browse_histories').update({
+                    let doc_id = res.data[0]._id
+                    db.collection('browse_histories').doc(doc_id).update({
                         data: {
                             poetry_collection_date: Date.parse(Date())
                         }
@@ -485,8 +501,7 @@ export default class PoemCont extends wepy.component {
                             poetry_content: that.poemStr,
                             poetry_author: gushiwen.author,
                             poetry_collection_date: Date.parse(Date()),
-                            poetry_search_type: '',
-                            usersignature: wepy.$instance.globalData.userInfo.signature
+                            poetry_search_type: ''
                         }
                     })
                 }
@@ -514,13 +529,14 @@ export default class PoemCont extends wepy.component {
     }
 
     onLoad () {
+        this.agreed = wepy.$instance.globalData.userInfo != null
         wepy.getSystemInfo({ success: res => {
             this.width = res.screenWidth;
             this.height = res.screenHeight;
             this.ratio_w = res.pixelRatio;
         }});
         
-        if (wepy.$instance.globalData.openid.length == 0) {
+        if (wepy.$instance.globalData.openid == null) {
             wepy.$instance.getOpenId()
         } 
         

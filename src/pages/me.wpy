@@ -48,9 +48,10 @@ export default class Me extends wepy.page{
             if (!res.detail.userInfo || !res.detail.signature) {
                 return
             }
-
-            this.hideLogBtn = true
+            this.hideLogBtn = false
+            this.avatar = res.detail.userInfo.avatarUrl
             wepy.$instance.globalData.userInfo = res.detail
+            wepy.$instance.getOpenId()
         }
     }
 
@@ -94,7 +95,7 @@ export default class Me extends wepy.page{
         justify-content: flex-start;
         align-items: center;
         padding: 5px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         border-bottom: gainsboro 1px solid;
         .section_icon {
             width: 20px;
