@@ -55,7 +55,7 @@ export default class Recommend extends wepy.page{
                 title: "没有更多数据",
                 mask: true,
                 icon: 'none',
-                duration: 1500
+                duration: 1000
             })
             return
         }
@@ -76,11 +76,6 @@ export default class Recommend extends wepy.page{
             },
             url: 'https://appbei.gushiwen.cn/api/onehour/Default.aspx',
             success: (res) => {
-                if(callback) {
-                    callback(res.data.gushiwens)
-                    return
-                }
-
                 if(res.data.gushiwens == undefined) {
                     that.$apply()
                     return
@@ -94,17 +89,19 @@ export default class Recommend extends wepy.page{
                 that.$apply()
             },
             fail: (error) => {
-                console.log(error)
                 wepy.showToast({
                   title: '请求失败', //提示的内容,
                   icon: 'error', //图标,
-                  duration: 2000, //延迟时间,
+                  duration: 1000, //延迟时间,
                   mask: true, //显示透明蒙层，防止触摸穿透,
                   success: res => {}
                 });
                 
             },
             complete: () => {
+                if(callback) {
+                    callback()
+                }
                 wepy.hideNavigationBarLoading()
                 // 短暂震动
                 wx.vibrateShort()

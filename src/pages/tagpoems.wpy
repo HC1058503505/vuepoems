@@ -91,7 +91,14 @@ export default class TagPoems extends wepy.page{
                 that.$apply()
             },
             fail: (error) => {
-                console.log(error)
+                wepy.showToast({
+                  title: '加载失败', //提示的内容,
+                  icon: 'error', //图标,
+                  duration: 1000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {}
+                });
+                
             },
             complete: () => {
                 wepy.hideNavigationBarLoading();

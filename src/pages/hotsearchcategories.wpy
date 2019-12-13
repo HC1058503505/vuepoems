@@ -39,10 +39,13 @@ export default class HotSearchCategories extends wepy.page{
 
     data = {
         selectedIndex: 0,
-        searchConditions: Object,
+        searchConditions: null,
         sectionId: ''
     }
 
+    config = {
+      enablePullDownRefresh: true
+    }
 
     methods = {
         search_action () {
@@ -51,6 +54,15 @@ export default class HotSearchCategories extends wepy.page{
         selectedBarItem (index) {
             this.selectedIndex = index
         }
+    }
+
+    onPullDownRefresh() {
+        if (this.searchConditions != null) {
+            wepy.stopPullDownRefresh();
+            return
+        }
+
+        this.requestSearchHotKeys()
     }
 
     onLoad (params) {
@@ -76,9 +88,17 @@ export default class HotSearchCategories extends wepy.page{
                 that.$apply()
             },
             fail: function (error) {
-
+                wepy.showToast({
+                  title: '请求失败', //提示的内容,
+                  icon: 'error', //图标,
+                  duration: 1000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {}
+                });
+                
             },
             complete: function () {
+                wepy.stopPullDownRefresh();
                 wepy.hideNavigationBarLoading()
                 wepy.vibrateShort()
             }

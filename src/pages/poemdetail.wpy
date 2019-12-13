@@ -38,10 +38,15 @@ export default class PoemDetail extends wepy.page {
         poemAuthor: PoemAuthorCom
     }
 
+    config = {
+      enablePullDownRefresh: true
+    }
+
     data = {
-        poem: Object,
+        poem: null,
         poemtags: [String],
-        selectedIndex: 0
+        selectedIndex: 0,
+        params: null
     }
 
     events = {
@@ -65,26 +70,41 @@ export default class PoemDetail extends wepy.page {
       };
     }
 
+    onPullDownRefresh() {
+        if (this.poem != null) {
+            wepy.stopPullDownRefresh();
+            return
+        }
+
+        this.requestPoemDetail()
+    }
+
     onLoad(params, data) {
         if(!params.idnew) {
             return
         }
-        
         // wepy.$instance.globalData
         if (params.nameStr) {
             wepy.setNavigationBarTitle({ title: params.nameStr })
         }
+        
+        this.params = params
+
+        this.requestPoemDetail()
+    }
+
+    requestPoemDetail() {
         wepy.showNavigationBarLoading();
         
         let path = '/api/shiwen/shiwenv3.aspx'
-        if (params.type === 'mingju') {
+        if (this.params.type === 'mingju') {
             path = '/api/mingju/juv2.aspx'
         }
         let that = this
         Request({
             url: path,
             method: 'post',
-            data: {token: 'gswapi', id: params.idnew},
+            data: {token: 'gswapi', id: that.params.idnew},
             header: {
                 'content-type': 'application/x-www-form-urlencoded',
             },
@@ -95,9 +115,16 @@ export default class PoemDetail extends wepy.page {
                 that.$apply()
             },
             fail: (error) => {
-
+                wepy.showToast({
+                  title: '请求失败', //提示的内容,
+                  icon: 'error', //图标,
+                  duration: 1000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {}
+                });
             },
             complete: () => {
+                wepy.stopPullDownRefresh();
                 wepy.hideNavigationBarLoading();
                 // 短暂震动
                 wx.vibrateShort()
