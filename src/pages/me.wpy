@@ -12,15 +12,13 @@
 
     <view class="section_list_container">
         <view class="section_cell" @tap="showMore('mine_collection')">
-            <image class="section_icon" src="../images/yes_collection.png" mode="aspectFill"
-              lazy-load="false">
-            </image>
+            <view class="iconfont icon-collection section_icon">
+            </view>
             <view class="section_title">我的收藏</view>
         </view>
         <view class="section_cell" @tap="showMore('browse_histories')">
-            <image class="section_icon" src="../images/liulanjilu.png" mode="aspectFill"
-              lazy-load="false">
-            </image>
+            <view class="iconfont icon-zuijinliulan section_icon">
+            </view>
             <view class="section_title">浏览记录</view>
         </view>
     </view>
@@ -70,8 +68,15 @@ export default class Me extends wepy.page{
         }
     }
 
-    onShow () {
-
+    onShareAppMessage() {
+      return {
+        title: '诗词口袋，感受中国优秀传统文化魅力',
+        path: '/pages/me',
+        imageUrl: '../images/shici.png',
+        success: res => {},
+        fail: () => {},
+        complete: () => {}
+      };
     }
 
     onUnload () {
@@ -124,12 +129,14 @@ export default class Me extends wepy.page{
         margin-bottom: 15px;
         border-bottom: gainsboro 1px solid;
         .section_icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
         }
         .section_title {
-            font-size: 15px;
+            font-size: 14px;
         }
     }
 }

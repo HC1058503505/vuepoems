@@ -1,4 +1,6 @@
 <style lang="less">
+@import "/iconfont/iconfont.less";
+
 .container {
   height: 100%;
   display: flex;

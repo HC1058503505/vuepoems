@@ -32,7 +32,7 @@ export default class Recommend extends wepy.page{
 
     onShareAppMessage() {
       return {
-        title: '小诗词--感受中国优秀传统文化魅力',
+        title: '诗词口袋，感受中国优秀传统文化魅力',
         path: '/pages/recommend',
         imageUrl: '../images/shici.png',
         success: res => {},

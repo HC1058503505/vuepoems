@@ -72,6 +72,17 @@ export default class FindMore extends wepy.page{
         }
     }
 
+    onShareAppMessage() {
+      return {
+        title: '诗词口袋，感受中国优秀传统文化魅力',
+        path: '/pages/findmore',
+        imageUrl: '../images/shici.png',
+        success: res => {},
+        fail: () => {},
+        complete: () => {}
+      };
+    }
+
     onLoad() {
         this.requestHotSearchKeys()
     }

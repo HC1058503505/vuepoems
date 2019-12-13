@@ -1,30 +1,45 @@
 <template lang="wxml">
     
     <view class="collections_container">
-        <repeat for="{{collections}}" key="index" index="index" item="collection">
-            <view class="collection_section" @tap="showPoemDetail({{collection}})">
+        <!-- <repeat for="{{collections}}" key="index" index="index" item="collection">
+        </repeat> -->
+        <swipeDelete :list.sync="collections"
+               :editButton="buttons"
+               :addButton="buttons"
+               :markButton="buttons"
+               @deleteTap.user="deleteTap"
+               @deleteLongTap.user="deleteLongTap"
+              >
+            <view class="collection_section" @tap="showPoemDetail({{item}})">
                 <view class="collection_title_container">
-                    <view class="collection_name">{{collection.poetry_name}}</view>
-                    <view class="collection_dynasty_author">{{collection.poetry_dynasty}}/{{collection.poetry_author}}</view>
+                    <view class="collection_name">{{item.poetry_name}}</view>
+                    <view class="collection_dynasty_author">{{item.poetry_dynasty}}/{{item.poetry_author}}</view>
                 </view>
-                <view class="collection_content">{{collection.poetry_content}}</view>
+                <view class="collection_content">{{item.poetry_content}}</view>
             </view>
-        </repeat>
+        </swipeDelete>
     </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+import SwipeDeleteView from '@/components/wepy-swipe-delete-view'
 export default class CollectionHistory extends wepy.page {
+    components = {
+      swipeDelete: SwipeDeleteView
+    }
 
     config = {
-      enablePullDownRefresh: true
+      enablePullDownRefresh: true,
     }
 
     data = {
         collections: [],
         pageNum: 0,
-        collection_name: null
+        collection_name: null,
+        buttons: {
+            show: false
+        }
     }
 
     methods = {
@@ -33,6 +48,23 @@ export default class CollectionHistory extends wepy.page {
         },
         reloadAction () {
             this.requestCollections()
+        },
+        deleteTap (view, item) {
+            this.removeFromCollections(view, item)
+        },
+        deleteLongTap (view, item) {
+            let that = this
+            wx.showModal({
+                title: '提示',
+                content: '确定要删除吗？',
+                success: function (res) {
+                    if (res.confirm) {
+                        that.removeFromCollections(view, item)
+                    } else {
+                        view.closeItem();
+                    }
+                }
+            });
         }
     }
 
@@ -64,7 +96,29 @@ export default class CollectionHistory extends wepy.page {
         this.requestCollections()
     }
 
-    requestCollections(callback) {
+    removeFromCollections (view, item) {
+        wepy.showNavigationBarLoading()
+        var that = this
+        let db = wx.cloud.database()
+        db.collection(that.collection_name).doc(item._id).remove({
+            success: (res) => {
+                view.deleteItem()
+            },
+            error: (errormsg) => {
+                wepy.showToast({
+                  title: '删除失败', //提示的内容,
+                  icon: 'error', //图标,
+                  duration: 1000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {}
+                });
+            },
+            complete: () => {
+                wepy.hideNavigationBarLoading();
+            }
+        })
+    }
+    requestCollections (callback) {
         
         if (wepy.$instance.globalData.openid == null) {
             return
@@ -90,7 +144,7 @@ export default class CollectionHistory extends wepy.page {
                 wepy.showToast({
                   title: '没有更多数据', //提示的内容,
                   icon: 'none', //图标,
-                  duration: 2000, //延迟时间,
+                  duration: 1000, //延迟时间,
                   mask: true, //显示透明蒙层，防止触摸穿透,
                   success: res => {}
                 });
@@ -109,6 +163,8 @@ export default class CollectionHistory extends wepy.page {
             
             that.pageNum ++
             that.collections = that.collections.concat(gushiwens)
+            that.$apply();
+            that.$invoke('swipeDelete', 'update');
           },
           fail: function(error) {
               wepy.showToast({
@@ -123,9 +179,12 @@ export default class CollectionHistory extends wepy.page {
           complete: function() {
             callback && callback()
             wepy.hideNavigationBarLoading()
+            // 更新组件
+            // that.$invoke('swipeDeleteCom', 'update')
+            // that.$apply()
             // 短暂震动
             wepy.vibrateShort()
-            that.$apply()
+            
           }
         })
 
@@ -135,8 +194,6 @@ export default class CollectionHistory extends wepy.page {
 
 <style lang="less" scoped>
 .collections_container {
-    padding-left: 10px;
-    padding-right: 10px;
     align-items: center;
     .reload {
         text-align: center;
@@ -145,9 +202,12 @@ export default class CollectionHistory extends wepy.page {
         margin-top: 50%;
     }
     .collection_section {
+        padding-left: 10px;
+        padding-right: 10px;
         border-bottom: 1px solid gainsboro;
         padding-bottom: 8px;
         padding-top: 8px;
+        background: white;
         .collection_title_container {
             font-size: 14px;
             display: flex;
