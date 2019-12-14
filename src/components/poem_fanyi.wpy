@@ -1,5 +1,5 @@
-<template>
-    <view class="fanyi_container">
+<template lang="wxml">
+    <view class="fanyi_container" wx:if="{{poemFanyi.tb_fanyis.fanyis.length > 0}}">
         <repeat for="{{poemFanyi.tb_fanyis.fanyis}}" item="fanyi" key="index">
             <view class="section_title">{{fanyi.nameStr}}</view>
             <rich-text nodes="{{fanyi.cont}}"></rich-text>
@@ -8,6 +8,7 @@
             </block>
         </repeat>
     </view>
+    <view class="yi_ming" wx:else>暂无</view>
 </template>
 
 <script>
@@ -51,5 +52,13 @@ export default class PoemFanyi extends wepy.component{
         font-size: 13px;
         color: gray;
     }
+}
+
+.yi_ming {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    padding-top: 50px;
+    color: gray;
 }
 </style>

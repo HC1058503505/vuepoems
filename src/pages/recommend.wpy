@@ -86,7 +86,6 @@ export default class Recommend extends wepy.page{
                 that.poems = that.poems.concat(res.data.gushiwens)
                 that.currentPage = that.currentPage + 1
                 that.sumPage = res.data.sumPage
-                that.$apply()
             },
             fail: (error) => {
                 wepy.showToast({
@@ -105,6 +104,7 @@ export default class Recommend extends wepy.page{
                 wepy.hideNavigationBarLoading()
                 // 短暂震动
                 wx.vibrateShort()
+                that.$apply()
             }
         }) 
     }

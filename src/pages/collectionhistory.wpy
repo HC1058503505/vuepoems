@@ -50,6 +50,12 @@ export default class CollectionHistory extends wepy.page {
             this.requestCollections()
         },
         deleteTap (view, item) {
+            wepy.showLoading({
+              title: '', //提示的内容,
+              mask: true, //显示透明蒙层，防止触摸穿透,
+              success: res => {}
+            });
+            
             this.removeFromCollections(view, item)
         },
         deleteLongTap (view, item) {
@@ -104,16 +110,17 @@ export default class CollectionHistory extends wepy.page {
             success: (res) => {
                 view.deleteItem()
             },
-            error: (errormsg) => {
+            fail: (errormsg) => {
                 wepy.showToast({
-                  title: '删除失败', //提示的内容,
-                  icon: 'error', //图标,
-                  duration: 1000, //延迟时间,
-                  mask: true, //显示透明蒙层，防止触摸穿透,
-                  success: res => {}
+                    title: '删除失败', //提示的内容,
+                    icon: 'error', //图标,
+                    duration: 1000, //延迟时间,
+                    mask: true, //显示透明蒙层，防止触摸穿透,
+                    success: res => {}
                 });
             },
             complete: () => {
+                wepy.hideLoading();
                 wepy.hideNavigationBarLoading();
             }
         })

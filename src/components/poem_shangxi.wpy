@@ -1,5 +1,5 @@
-<template>
-    <view class="shangxi_container">
+<template lang="wxml">
+    <view class="shangxi_container" wx:if="{{poemShangxi.tb_shangxis.shangxis.length > 0}}">
         <repeat for="{{poemShangxi.tb_shangxis.shangxis}}" item="shangxi" key="index">
             <view class="section_title">{{shangxi.nameStr}}</view>
             <rich-text nodes="{{shangxi.cont}}"></rich-text>
@@ -8,6 +8,7 @@
             </block>
         </repeat>
     </view>
+    <view class="yi_ming" wx:else>暂无</view>
 </template>
 
 <script>
@@ -52,5 +53,13 @@ export default class PoemShangxi extends wepy.component{
         font-size: 13px;
         color: gray;
     }
+}
+
+.yi_ming {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    padding-top: 50px;
+    color: gray;
 }
 </style>

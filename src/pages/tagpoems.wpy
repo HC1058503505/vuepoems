@@ -56,6 +56,9 @@ export default class TagPoems extends wepy.page{
                 'content-type': 'application/x-www-form-urlencoded',
             },
             success: (res) => {
+                if (that.page_num == 1) {
+                    that.poems = []
+                }
                 that.page_num = that.page_num + 1
 
                 let gushiwens = []
@@ -88,7 +91,6 @@ export default class TagPoems extends wepy.page{
                 
                 that.poems = that.poems.concat(gushiwens)
                 that.total_page = res.data.sumPage
-                that.$apply()
             },
             fail: (error) => {
                 wepy.showToast({
@@ -105,6 +107,7 @@ export default class TagPoems extends wepy.page{
                 wepy.stopPullDownRefresh();
                 // 短暂震动
                 wx.vibrateShort()
+                that.$apply()
             }
         })
     }

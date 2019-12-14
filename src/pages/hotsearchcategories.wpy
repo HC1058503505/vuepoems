@@ -85,7 +85,6 @@ export default class HotSearchCategories extends wepy.page{
             success: function (res) {
                 // 输出 [{ "title": "The Catcher in the Rye", ... }]
                 that.searchConditions = res.data[0]
-                that.$apply()
             },
             fail: function (error) {
                 wepy.showToast({
@@ -98,9 +97,10 @@ export default class HotSearchCategories extends wepy.page{
                 
             },
             complete: function () {
-                wepy.stopPullDownRefresh();
+                wepy.stopPullDownRefresh()
                 wepy.hideNavigationBarLoading()
                 wepy.vibrateShort()
+                that.$apply()
             }
         })
     }
