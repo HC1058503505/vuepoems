@@ -186,12 +186,8 @@ export default class CollectionHistory extends wepy.page {
           complete: function() {
             callback && callback()
             wepy.hideNavigationBarLoading()
-            // 更新组件
-            // that.$invoke('swipeDeleteCom', 'update')
-            // that.$apply()
             // 短暂震动
             wepy.vibrateShort()
-            
           }
         })
 

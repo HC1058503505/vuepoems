@@ -1,6 +1,6 @@
 <template lang="wxml">
     <view class="avatar_container">
-        <image class="avatar_icon" src="{{avatar}}" mode="aspectFill"
+        <image class="avatar_icon {{hideLogBtn ? 'iconfont icon-shi' : ''}}" src="{{hideLogBtn ? '' : avatar}}" mode="aspectFill"
       lazy-load="false">
         </image>
 
@@ -34,7 +34,7 @@ export default class Me extends wepy.page{
     }
 
     data = {
-        avatar: '../images/shi.png',
+        avatar: '',
         hideLogBtn: true,
         logBtnTitle: '点击登录',
         loginTimer: null,
@@ -99,6 +99,12 @@ export default class Me extends wepy.page{
 <style lang="less" scoped>
 .avatar_container {
     text-align: center;
+    .icon-shi {
+        font-size: 95px;
+        color: #d4237a;
+        height: 100px;   
+        width: 100px;
+    }
     .avatar_icon {
         height: 100px;   
         width: 100px;
@@ -128,6 +134,16 @@ export default class Me extends wepy.page{
         padding: 10px;
         margin-bottom: 15px;
         border-bottom: gainsboro 1px solid;
+        .icon-collection {
+            color :#d4237a;
+            font-size: 16px;
+        }
+
+        .icon-zuijinliulan {
+            color: #1296db;
+            font-size: 16px;
+        }
+
         .section_icon {
             display: flex;
             align-items: center;

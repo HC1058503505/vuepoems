@@ -2,18 +2,10 @@
     <block wx:if="{{ poemData.tb_gushiwen }}">
         <view class="poem_cont_container" >
                 <view class="poem_cont_tools">
-                    
-                    <button wx:if="{{agreed}}" class="action_btn" @tap="{{agreed ? 'collectionAction' : ''}}">
-                        <image class="action_img" src="{{isCollection ? '../images/yes_collection.png' : '../images/no_collection.png'}}"  /> 
-                    </button>
-                    <button wx:else class="action_btn" open-type="getUserInfo" bindgetuserinfo="{{agrred ? '' : 'getUserInfoAction'}}">
-                        <image class="action_img" src="{{isCollection ? '../images/yes_collection.png' : '../images/no_collection.png'}}"  /> 
-                    </button>
-
-                    <button class="action_btn" open-type='share'>
-                        <image class="action_img" src="../images/share.png"/>
-                    </button>
-                    <image class="more_img" src="../images/more.png" @tap="moreAction"/>
+                    <button wx:if="{{poemData.tb_gushiwen.langsongAuthorPY.length > 0}}" class="iconfont {{play ? 'icon-youpinwangtubiao' : 'icon-audio'}}" @tap="langSongAudioAction"></button>
+                    <button class="iconfont icon-collection {{isCollection ? 'yes_collection' : ''}}" open-type="getUserInfo" @tap="{{agreed ? 'collectionAction' : ''}}" bindgetuserinfo="{{agreed ? '' : 'getUserInfoAction'}}"></button>
+                    <button class="iconfont icon-share" open-type='share'></button>
+                    <button class="iconfont icon-more" @tap="moreAction"></button>
                 </view>
                 <view class="poem_chaodai_author">{{poemData.tb_gushiwen.chaodai + '/' + poemData.tb_gushiwen.author}}</view>
                 <view class="rich_cont_container">
@@ -45,7 +37,9 @@ export default class PoemCont extends wepy.component {
         openid: '',
         previewUrl: '',
         doc_id: '',
-        agreed: false
+        agreed: false,
+        backgroundAudioManager: null,
+        play: false
     }
 
     watch = {
@@ -64,8 +58,19 @@ export default class PoemCont extends wepy.component {
         }   
     }
 
+    audioPlay () {
+        this.play = true
+        this.$apply()
+    }
+
+    audioPause () {
+        this.play = false
+        this.$apply()
+    }
+
     methods = {
         getUserInfoAction (res) {
+            console.log(res)
             if (res.detail.userInfo == null) {
                 // 拒绝
                 return
@@ -77,13 +82,52 @@ export default class PoemCont extends wepy.component {
             
             // 获取openid
             let that = this
-            wepy.$instance.globalData.getOpenId(() => {
+            wepy.$instance.getOpenId(() => {
                 that.judgeCollection()
                 that.addBrowseHistories(that.poemData)
             })
             
         },
+        langSongAudioAction () {
+            let that = this
+            if (this.play) {
+                this.backgroundAudioManager.pause()
+                this.audioPause()
+                return
+            }
 
+
+            if (this.poemData == null) {
+                return
+            }
+
+            let tb_gushiwen = this.poemData.tb_gushiwen
+
+            if (tb_gushiwen.langsongAuthorPY.length <= 0) {
+                return
+            }
+            if (this.backgroundAudioManager == null) {
+                this.backgroundAudioManager = wx.getBackgroundAudioManager()
+            }
+            this.backgroundAudioManager.title = tb_gushiwen.nameStr
+            this.backgroundAudioManager.src = `https://song.gushiwen.cn/song/${tb_gushiwen.langsongAuthorPY}/${tb_gushiwen.idnew}.mp3`
+            this.backgroundAudioManager.onPlay(() => {
+                that.audioPlay()
+            })
+            
+
+            this.backgroundAudioManager.onPause(() => {
+                that.audioPause()
+            })
+
+            this.backgroundAudioManager.onStop(() => {
+                that.audioPause()
+            })
+
+            this.backgroundAudioManager.onEnded(() => {
+                that.audioPause()
+            })
+        },
         collectionAction () {
             this.collectionOrCancle()
         },
@@ -110,7 +154,6 @@ export default class PoemCont extends wepy.component {
                   }
               },
               complete: () => {
-                  console.log('showActionSheet complete')
               }
             });
             
@@ -551,7 +594,7 @@ export default class PoemCont extends wepy.component {
 <style lang="less" scoped>
 .poem_cont_container {
     background-color: ghostwhite;
-    padding: 15px;
+    padding: 10px;
     margin-left: 15px;
     margin-right: 15px;
     .poem_chaodai_author {
@@ -565,15 +608,51 @@ export default class PoemCont extends wepy.component {
         display: -webkit-flex;
         justify-content: flex-end;
         padding-bottom: 10px;
-        .more_img {
-            width: 22px;
-            height: 22px;
-            padding-right: 10px;
+        .icon-youpinwangtubiao {
+            animation-name: myfirst; /*动画的名称 */
+            animation-duration: 2000ms; /*动画从开始到结束的时间*/
+            animation-timing-function: linear; /*动画执行快慢的参数*/
+            animation-iteration-count: infinite; /*动画执行多少次的参数*//*以下是兼容ios所需，参数意义与上相同*/
+            -webkit-animation-name: myfirst;
+            -webkit-animation-duration: 2000ms;
+            -webkit-animation-timing-function: linear;
+            -webkit-animation-iteration-count: infinite;
+        }
+
+        @keyframes myfirst {
+            /*开始转的角度*/
+            from {
+                transform: rotate(0deg);
+            }/*结束的角度*/
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        /*兼容ios*/
+        @-webkit-keyframes myfirst {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        button {
+            background: none !important;
+            margin: 0px;
+            padding: 0px;
+            width: 40px;
+            font-size: 20px;
         }
 
         button::after {
-            background: none !important;
             border: none;
+            outline: none;
+        }
+
+        .yes_collection {
+            color :#d4237a;
         }
 
         .action_btn {

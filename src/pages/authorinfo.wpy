@@ -37,7 +37,6 @@ export default class AuthorInfo extends wepy.page {
                 'content-type': 'application/x-www-form-urlencoded'
             },
             success: (res) => {
-                console.log(res.data)
                 that.authorMoreInfo = res.data
                 that.$apply()
             },

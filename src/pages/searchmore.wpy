@@ -92,12 +92,13 @@ export default class SearchMore extends wepy.page{
                 },
                 success: (res) => {
                     that.searchResult = res.data
+                    that.$apply()
                 },
                 fail: (error) => {
 
                 },
                 complete: () => {
-                    that.$apply()
+                    
                 }
             })
         }

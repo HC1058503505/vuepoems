@@ -64,6 +64,7 @@ export default class extends wepy.app {
       navigationBarTitleText: '小诗词',
       navigationBarTextStyle: 'black'
     },
+    requiredBackgroundModes: ['audio'],
     sitemapLocation: 'sitemap.json'
   }
 

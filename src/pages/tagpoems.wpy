@@ -91,6 +91,7 @@ export default class TagPoems extends wepy.page{
                 
                 that.poems = that.poems.concat(gushiwens)
                 that.total_page = res.data.sumPage
+                that.$apply()
             },
             fail: (error) => {
                 wepy.showToast({
@@ -107,7 +108,6 @@ export default class TagPoems extends wepy.page{
                 wepy.stopPullDownRefresh();
                 // 短暂震动
                 wx.vibrateShort()
-                that.$apply()
             }
         })
     }

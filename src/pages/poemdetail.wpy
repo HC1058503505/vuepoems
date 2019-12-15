@@ -112,6 +112,7 @@ export default class PoemDetail extends wepy.page {
                 that.poem = res.data
                 wepy.setNavigationBarTitle({ title: that.poem.tb_gushiwen.nameStr })
                 that.poemtags = res.data.tb_gushiwen.tag.length > 0 ? res.data.tb_gushiwen.tag.split('|') : [String]
+                that.$apply()
             },
             fail: (error) => {
                 wepy.showToast({
@@ -127,7 +128,6 @@ export default class PoemDetail extends wepy.page {
                 wepy.hideNavigationBarLoading();
                 // 短暂震动
                 wx.vibrateShort()
-                that.$apply()
             }
         })
     }
