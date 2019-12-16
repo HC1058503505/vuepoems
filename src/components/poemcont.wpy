@@ -110,6 +110,7 @@ export default class PoemCont extends wepy.component {
                 this.backgroundAudioManager = wx.getBackgroundAudioManager()
             }
             this.backgroundAudioManager.title = tb_gushiwen.nameStr
+            this.backgroundAudioManager.singer = tb_gushiwen.langsongAuthor
             this.backgroundAudioManager.src = `https://song.gushiwen.cn/song/${tb_gushiwen.langsongAuthorPY}/${tb_gushiwen.idnew}.mp3`
             this.backgroundAudioManager.onPlay(() => {
                 that.audioPlay()
