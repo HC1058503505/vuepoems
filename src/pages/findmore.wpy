@@ -104,13 +104,13 @@ export default class FindMore extends wepy.page{
                 // 输出 [{ "title": "The Catcher in the Rye", ... }]
                 wepy.hideNavigationBarLoading();
                 that.hotSearchKeys = res.data[0].hotsearch
+                that.requestHotKeysFinished = true
                 that.$apply()
             },
             fail: function (error) {
 
             },
             complete: function () {
-                that.requestHotKeysFinished = true
                 wepy.hideNavigationBarLoading()
                 wepy.vibrateShort()
             }
