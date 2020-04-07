@@ -20,7 +20,7 @@
 <script>
 import wepy from 'wepy'
 import WXParse from '../wxParse/wxParse.js'
-
+import Request from '../request/request.js'
 export default class PoemCont extends wepy.component {
     props = {
         poemData: Object,
@@ -68,6 +68,33 @@ export default class PoemCont extends wepy.component {
         this.$apply()
     }
 
+    audioPlayInit(playUrl) {
+        let that = this
+        let tb_gushiwen = this.poemData.tb_gushiwen
+        if (this.backgroundAudioManager == null) {
+                this.backgroundAudioManager = wx.getBackgroundAudioManager()
+            }
+            this.backgroundAudioManager.title = tb_gushiwen.nameStr
+            this.backgroundAudioManager.singer = tb_gushiwen.langsongAuthor
+            this.backgroundAudioManager.src = playUrl
+            this.backgroundAudioManager.onPlay(() => {
+                that.audioPlay()
+            })
+            
+
+            this.backgroundAudioManager.onPause(() => {
+                that.audioPause()
+            })
+
+            this.backgroundAudioManager.onStop(() => {
+                that.audioPause()
+            })
+
+            this.backgroundAudioManager.onEnded(() => {
+                that.audioPause()
+            })
+    }
+
     methods = {
         getUserInfoAction (res) {
             console.log(res)
@@ -106,29 +133,31 @@ export default class PoemCont extends wepy.component {
             if (tb_gushiwen.langsongAuthorPY.length <= 0) {
                 return
             }
-            if (this.backgroundAudioManager == null) {
-                this.backgroundAudioManager = wx.getBackgroundAudioManager()
-            }
-            this.backgroundAudioManager.title = tb_gushiwen.nameStr
-            this.backgroundAudioManager.singer = tb_gushiwen.langsongAuthor
-            this.backgroundAudioManager.src = `https://song.gushiwen.cn/song/${tb_gushiwen.langsongAuthorPY}/${tb_gushiwen.idnew}.mp3`
-            this.backgroundAudioManager.onPlay(() => {
-                that.audioPlay()
-            })
-            
 
-            this.backgroundAudioManager.onPause(() => {
-                that.audioPause()
-            })
+            Request({
+                url: '/api/shiwen/shiwenplay11.aspx',
+                method: 'post',
+                data: {token: 'gswapi', id: that.poemData.tb_gushiwen.idnew},
+                header: {
+                    'content-type': 'application/x-www-form-urlencoded',
+                },
+                success: (res) => {
+                    if (res.data.url == null) {
+                        return
+                    }
 
-            this.backgroundAudioManager.onStop(() => {
-                that.audioPause()
-            })
-
-            this.backgroundAudioManager.onEnded(() => {
-                that.audioPause()
+                    this.audioPlayInit(res.data.url)
+                    that.$apply()
+                },
+                fail: (error) => {
+                },
+                complete: () => {
+                    wepy.hideNavigationBarLoading();
+                }
             })
         },
+
+
         collectionAction () {
             this.collectionOrCancle()
         },

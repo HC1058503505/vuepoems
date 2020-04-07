@@ -96,9 +96,9 @@ export default class PoemDetail extends wepy.page {
     requestPoemDetail() {
         wepy.showNavigationBarLoading();
         
-        let path = '/api/shiwen/shiwenv3.aspx'
+        let path = '/api/shiwen/shiwenv11.aspx'
         if (this.params.type === 'mingju') {
-            path = '/api/mingju/juv2.aspx'
+            path = '/api/mingju/juv11.aspx'
         }
         let that = this
         Request({
@@ -117,7 +117,7 @@ export default class PoemDetail extends wepy.page {
             fail: (error) => {
                 wepy.showToast({
                   title: '请求失败', //提示的内容,
-                  icon: 'error', //图标,
+                  icon: 'none', //图标,
                   duration: 1000, //延迟时间,
                   mask: true, //显示透明蒙层，防止触摸穿透,
                   success: res => {}

@@ -30,7 +30,7 @@ export default class AuthorInfo extends wepy.page {
         wepy.showNavigationBarLoading();
         let that = this
         Request({
-            url: '/api/author/author2.aspx',
+            url: '/api/author/author10.aspx',
             method: 'post',
             data: {token: 'gswapi', id: params.idnew},
             header: {
@@ -43,7 +43,7 @@ export default class AuthorInfo extends wepy.page {
             fail: () => {
                 wepy.showToast({
                     title: '获取诗人信息失败', //提示的内容,
-                    icon: 'error', //图标,
+                    icon: 'none', //图标,
                     duration: 2000, //延迟时间,
                     mask: true, //显示透明蒙层，防止触摸穿透,
                     success: res => {}

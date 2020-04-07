@@ -8,6 +8,7 @@
 <script>
 import wepy from 'wepy'
 import PoemCellCom from '../components/poem_cell'
+import Request from '../request/request.js'
 
 export default class Recommend extends wepy.page{
 
@@ -65,16 +66,16 @@ export default class Recommend extends wepy.page{
     loadMoreRecommendPoems(callback) {
         let that = this
         wepy.showNavigationBarLoading()
-        wepy.request({
-            header: {
-                'content-type': 'application/x-www-form-urlencoded',
-            },
+        Request({
+            url: '/api/onehour/Default10.aspx',
             method: 'post',
             data: {
                 page: that.currentPage,
                 token: 'gswapi'
             },
-            url: 'https://appbei.gushiwen.cn/api/onehour/Default.aspx',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded',
+            },
             success: (res) => {
                 if(res.data.gushiwens == undefined) {
                     that.$apply()
@@ -91,7 +92,7 @@ export default class Recommend extends wepy.page{
             fail: (error) => {
                 wepy.showToast({
                   title: '请求失败', //提示的内容,
-                  icon: 'error', //图标,
+                  icon: 'none', //图标,
                   duration: 1000, //延迟时间,
                   mask: true, //显示透明蒙层，防止触摸穿透,
                   success: res => {}
@@ -106,7 +107,7 @@ export default class Recommend extends wepy.page{
                 // 短暂震动
                 wx.vibrateShort()
             }
-        }) 
+        })
     }
     
 }

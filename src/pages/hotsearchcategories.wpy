@@ -90,7 +90,7 @@ export default class HotSearchCategories extends wepy.page{
             fail: function (error) {
                 wepy.showToast({
                   title: '请求失败', //提示的内容,
-                  icon: 'error', //图标,
+                  icon: 'none', //图标,
                   duration: 1000, //延迟时间,
                   mask: true, //显示透明蒙层，防止触摸穿透,
                   success: res => {}

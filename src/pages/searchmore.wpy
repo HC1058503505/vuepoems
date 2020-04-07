@@ -31,17 +31,24 @@
             </repeat>
         </view>
 
-        <view wx:if="{{searchResult.books.length > 0}}">
+        <view wx:if="{{searchResult.gushiwens.length > 0}}">
             <view class="section_title">诗集</view>
+            <repeat for="{{searchResult.gushiwens}}" key="index" index="index" item="gushiwen">
+                <view class="result_cell" @tap="tapSearchResultItem('gushiwen', {{gushiwen.idnew}}, {{gushiwen.nameStr}})">{{gushiwen.nameStr}}</view>
+            </repeat>
+        </view>
+
+        <view wx:if="{{searchResult.books.length > 0}}">
+            <view class="section_title">书籍</view>
             <repeat for="{{searchResult.books}}" key="index" index="index" item="book">
-                <view class="result_cell" @tap="tapSearchResultItem('book', {{book.idnew}}, {{book.nameStr}})">{{book.nameStr}}</view>
+                <view class="result_cell" @tap="tapSearchResultItem('book', {{book.idnew}}, {{book.nameStr}})">{{book.nameStrKey}}</view>
             </repeat>
         </view>
 
         <view wx:if="{{searchResult.zhuantis.length > 0}}">
             <view class="section_title">专题</view>
-            <repeat for="{{searchResult.zhuantis}}" key="index" index="index" item="专题">
-                <view class="result_cell" @tap="">{{zhuantis.nameStr}}</view>
+            <repeat for="{{searchResult.zhuantis}}" key="index" index="index" item="zhuanti">
+                <view class="result_cell" @tap="tapSearchResultItem('zhuanti', 'tag', {{zhuanti.nameStr}})">{{zhuanti.nameKey}}</view>
             </repeat>
         </view>
     </view>
@@ -62,13 +69,14 @@ export default class SearchMore extends wepy.page{
             console.log(type, key, value)
             if (type === 'authorInfo') {
                 wepy.navigateTo({ url: '/pages/authorinfo?idnew=' + key + '&nameStr=' + value });
-                
             } else if (type === 'gushiwen') {
                 wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + key + '&nameStr=' + value });
             } else if (type === 'mingju') {
                 wepy.navigateTo({ url: '/pages/poemdetail?idnew=' + key + '&nameStr=' + '' + '&type=mingju' });
             } else if (type === 'book') {
 
+            } else if (type === 'zhuanti') {
+                wepy.navigateTo({url: '/pages/tagpoems?type=' + key + '&tagstr=' + value})
             }
         },
         searckAction (e) {
@@ -84,7 +92,7 @@ export default class SearchMore extends wepy.page{
             }
             let that = this
             Request({
-                url: '/api/ajaxSearch3.aspx',
+                url: '/api/ajaxSearch10.aspx',
                 data: {token: 'gswapi', valuekey: e.detail.value},
                 method: "POST",
                 header: {
@@ -92,10 +100,29 @@ export default class SearchMore extends wepy.page{
                 },
                 success: (res) => {
                     that.searchResult = res.data
+                    if (res.data == null || (res.data.gushiwens.length == 0 &&
+                                             res.data.mingjus.length == 0 && 
+                                             res.data.authors.length == 0 &&
+                                             res.data.zhuantis.length == 0 &&
+                                             res.data.books.length == 0)) {
+                        wepy.showToast({
+                            title: '未找到结果', //提示的内容,
+                            icon: 'none', //图标,
+                            duration: 1000, //延迟时间,
+                            mask: true, //显示透明蒙层，防止触摸穿透,
+                            success: res => {}
+                        });
+                    }
                     that.$apply()
                 },
                 fail: (error) => {
-
+                    wepy.showToast({
+                        title: '请求失败', //提示的内容,
+                        icon: 'none', //图标,
+                        duration: 1000, //延迟时间,
+                        mask: true, //显示透明蒙层，防止触摸穿透,
+                        success: res => {}
+                    });
                 },
                 complete: () => {
                     

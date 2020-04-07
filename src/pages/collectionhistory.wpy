@@ -113,7 +113,7 @@ export default class CollectionHistory extends wepy.page {
             fail: (errormsg) => {
                 wepy.showToast({
                     title: '删除失败', //提示的内容,
-                    icon: 'error', //图标,
+                    icon: 'none', //图标,
                     duration: 1000, //延迟时间,
                     mask: true, //显示透明蒙层，防止触摸穿透,
                     success: res => {}
@@ -176,7 +176,7 @@ export default class CollectionHistory extends wepy.page {
           fail: function(error) {
               wepy.showToast({
                 title: '加载失败', //提示的内容,
-                icon: 'error', //图标,
+                icon: 'none', //图标,
                 duration: 2000, //延迟时间,
                 mask: true, //显示透明蒙层，防止触摸穿透,
                 success: res => {}

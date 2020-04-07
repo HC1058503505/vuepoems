@@ -8,6 +8,7 @@
         <view class="author_info">
             <rich-text nodes="{{poemAuthor.tb_author.cont}}">
             </rich-text>
+            <view class="shi_count" @tap="showMorePoems">{{poemAuthor.tb_author.shiCount}}篇诗文>></view>
         </view>
         <block wx:if="{{!authorMoreInfo}}">
             <view class="author_more_info" @tap="showMoreAuthorInfo">
@@ -16,22 +17,6 @@
         </block>
 
         <block wx:else>
-            <!-----人生履历---->
-            <view class="magnum_opus_section">
-                <view class="section_title">代表作</view>
-                <view class="magnum_opus">
-                    <repeat for="{{authorMoreInfo.tb_gushiwens.gushiwens}}" key="index" index="index" item="gushiwen">
-                        <!-- <authorPoemCell class="author" :poemData.sync="gushiwen"></authorPoemCell> -->
-                        <view class="tag_poem_container" @tap="tapTagPoemCell({{gushiwen}})">
-                            <view class="tag_poem_title">{{gushiwen.nameStr}}
-                                <view class="tag_poem_chaodai_author">{{gushiwen.chaodai + '/' + gushiwen.author}}</view>
-                            </view>
-                            <rich-text class="tag_poem_cont" nodes="{{gushiwen.firstSentence}}"></rich-text>
-                        </view>
-                    </repeat>
-                </view>
-                <view class="shi_count" @tap="showMorePoems">{{poemAuthor.tb_author.shiCount}}篇诗文>></view>
-            </view>
             <!-----人生履历---->
             <view class="life_experince_section">
                 <repeat for="{{authorMoreInfo.tb_ziliaos.ziliaos}}" key="index" index="index" item="ziliao">
@@ -75,42 +60,20 @@ export default class PoemAuthor extends wepy.component{
             wepy.showNavigationBarLoading();
             let that = this
             Request({
-                url: '/api/author/author2.aspx',
+                url: '/api/author/author10.aspx',
                 method: 'post',
                 data: {token: 'gswapi', id: this.poemAuthor.tb_author.idnew},
                 header: {
                     'content-type': 'application/x-www-form-urlencoded'
                 },
-                success: (res) => {
-
-                    let gushiwens = res.data.tb_gushiwens.gushiwens
-                    gushiwens.forEach(element => {
-                        let elementCont = element.cont
-                        let contentNodes = WXParse.wxParse('contnodes', 'html', elementCont, that).contnodes
-
-                        let nodeIndex = 0
-                        while (contentNodes.hasOwnProperty('nodes')) {
-                            let nodeElement = contentNodes.nodes[nodeIndex]
-
-                            if (nodeElement.node === "text") {
-                                element.firstSentence = nodeElement.text
-                                break
-                            } else if (nodeElement.hasOwnProperty('nodes')) {
-                                contentNodes = nodeElement
-                                nodeIndex = 0
-                                continue
-                            } 
-                            
-                            nodeIndex = nodeIndex + 1
-                        }
-                    });
+                success: (res) => {                    
                     that.authorMoreInfo = res.data
                     that.$apply()
                 },
                 fail: () => {
                     wepy.showToast({
                       title: '获取诗人信息失败', //提示的内容,
-                      icon: 'error', //图标,
+                      icon: 'none', //图标,
                       duration: 1000, //延迟时间,
                       mask: true, //显示透明蒙层，防止触摸穿透,
                       success: res => {}
@@ -158,18 +121,13 @@ export default class PoemAuthor extends wepy.component{
 
     .author_info {
         line-height: 25px;
-    }
-
-    .magnum_opus_section {
         .shi_count {
             padding-top: 10px;
             color: #2A537A;
             font-weight: bold;
         }
-
-        
     }
-
+    
     .life_experince_section {
         .ziliao_cankao {
             padding-top: 15px;

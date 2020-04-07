@@ -32,7 +32,7 @@ export default class TagPoems extends wepy.page{
         wepy.showNavigationBarLoading();
         let that = this
         let postData = {token: 'gswapi', page: this.page_num}
-        let path = '/api/shiwen/Default.aspx'
+        let path = '/api/shiwen/Default11.aspx'
 
         if (this.params.type === 'tag' || this.params.type === 'poemalbum') {
             postData['id'] = ''
@@ -96,7 +96,7 @@ export default class TagPoems extends wepy.page{
             fail: (error) => {
                 wepy.showToast({
                   title: '加载失败', //提示的内容,
-                  icon: 'error', //图标,
+                  icon: 'none', //图标,
                   duration: 1000, //延迟时间,
                   mask: true, //显示透明蒙层，防止触摸穿透,
                   success: res => {}
